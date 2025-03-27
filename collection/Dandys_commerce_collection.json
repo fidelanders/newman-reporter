@@ -1,0 +1,4583 @@
+{
+	"info": {
+		"_postman_id": "9a437d47-11c3-450d-b9d4-74687c525039",
+		"name": "Dandys Ecommerce",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39229288",
+		"_collection_link": "https://crimson-meteor-266011.postman.co/workspace/DandysApp~d99cd77e-3fb4-415e-8601-3a2b421a234e/collection/39229288-9a437d47-11c3-450d-b9d4-74687c525039?action=share&source=collection_link&creator=39229288"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Sign Up Tests",
+					"item": [
+						{
+							"name": "Sign Up",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"const expectedStatus = {\r",
+											"    \"valid_signup\": 200 || 201,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"missing_password\": 400,\r",
+											"    \"invalid_email_format\": 400,\r",
+											"    \"weak_password\": 400,\r",
+											"    \"existing_email\": 409\r",
+											"};\r",
+											"\r",
+											"// ✅ Test Case 1: Validate Status Code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// Handle successful signup response\r",
+											"if (pm.response.code === 200 || 201) {\r",
+											"    // ✅ Test Case 2: Verify Success Field\r",
+											"    pm.test(\"Verify that the success field is true\", function () {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 3: Check Message Field Value\r",
+											"    pm.test(\"Check that the message field is 'User registered successfully'\", function () {\r",
+											"        pm.expect(response.message).to.includes(\"User sign up successful\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 4: Validate User Data Fields\r",
+											"    pm.test(\"Validate that the user data fields are present\", function () {\r",
+											"        let user = response.data.user;\r",
+											"\r",
+											"        pm.expect(user).to.have.property(\"email\");\r",
+											"        pm.expect(user).to.have.property(\"fullName\");\r",
+											"        pm.expect(user).to.have.property(\"firstName\");\r",
+											"        pm.expect(user).to.have.property(\"lastName\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 5: Validate Email Matches Request\r",
+											"    pm.test(\"Validate that the email in response matches the request\", function () {\r",
+											"        let requestData = JSON.parse(pm.request.body.raw);\r",
+											"        pm.expect(response.data.user.email).to.eql(requestData.email);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 6: Validate Response Time\r",
+											"    pm.test(\"Validate that the response time is less than 1000ms\", function () {\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    });\r",
+											"\r",
+											"} \r",
+											"// Handle error cases\r",
+											"else {\r",
+											"    pm.test(\"Response contains an error message\", function () {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.be.a(\"string\");\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// ✅ Store email for Future Requests\r",
+											"pm.environment.set(\"reg.email\", response.data.user.email);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"function getRandomNames() {\r",
+											"    const names = [\r",
+											"        \"James\", \"Mary\", \"John\", \"Patricia\", \"Robert\", \"Jennifer\", \"Ben\", \r",
+											"        \"Michael\", \"Linda\", \"William\", \"Elizabeth\", \"David\", \"Johnson\", \r",
+											"        \"Richard\", \"Fydel\", \"Joseph\", \"Jessica\", \"Thomas\", \"Sarah\", \"Ojay\", \"Rodri\",\r",
+											"        \"Charles\", \"Karen\", \"Christopher\", \"Lisa\", \"Daniel\", \"Nancy\", \"Walter\",\r",
+											"        \"Friedrich\", \"Betty\", \"Anthony\", \"Margaret\", \"Mark\", \"Sandra\", \"James\"\r",
+											"    ];\r",
+											"\r",
+											"    // Ensure firstName and lastName are different\r",
+											"    let firstName = names[Math.floor(Math.random() * names.length)];\r",
+											"    let lastName = names[Math.floor(Math.random() * names.length)];\r",
+											"\r",
+											"    // If firstName and lastName are the same, keep generating a new lastName until they are different\r",
+											"    while (firstName === lastName) {\r",
+											"        lastName = names[Math.floor(Math.random() * names.length)];\r",
+											"    }\r",
+											"\r",
+											"    return { firstName, lastName };\r",
+											"}\r",
+											"\r",
+											"// Generate random first and last names\r",
+											"const { firstName: randomFirstName, lastName: randomLastName } = getRandomNames();\r",
+											"\r",
+											"// Function to generate a random email\r",
+											"function generateRandomEmail() {\r",
+											"    return `test_${Math.floor(Math.random() * 1000)}@example.com`;\r",
+											"}\r",
+											"\r",
+											"\r",
+											"// Define test cases\r",
+											"const testCases = {\r",
+											"    \"valid_signup\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": generateRandomEmail(), \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"Pass$12345\" \r",
+											"    },\r",
+											"    \"missing_email\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": \"\", \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"Pass$12345\" \r",
+											"    },\r",
+											"    \"missing_password\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": generateRandomEmail(), \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"\" \r",
+											"    },\r",
+											"    \"invalid_email_format\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": \"invalid-email\", \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"Pass$12345\" \r",
+											"    },\r",
+											"    \"weak_password\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": generateRandomEmail(), \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"123\" \r",
+											"    },\r",
+											"    \"existing_email\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"email\": \"existing@mail.com\", \r",
+											"        \"accountType\": \"SELLER\", \r",
+											"        \"password\": \"Pass$12345\" \r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get the current test case (default: valid_signup)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_signup\";\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/signup/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"signup",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Sign In",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const reg_pass = \"Pass$12345\";\r",
+											"pm.environment.set(\"reg.pass\", reg_pass)\r",
+											"\r",
+											"const testCases = {\r",
+											"    \"valid_login\": { \r",
+											"        \"email\":  pm.environment.get(\"reg.email\"), \r",
+											"        \"password\": reg_pass\r",
+											"    },\r",
+											"    \"missing_email\": { \r",
+											"        \"email\": \"\", \r",
+											"        \"password\": \"Pass$50000\" \r",
+											"    },\r",
+											"    \"missing_password\": { \r",
+											"        \"email\": \"existing@mail.com\", \r",
+											"        \"password\": \"\" \r",
+											"    },\r",
+											"    \"invalid_email_format\": { \r",
+											"        \"email\": \"invalid-email\", \r",
+											"        \"password\": \"Pass$50000\" \r",
+											"    },\r",
+											"    \"incorrect_password\": { \r",
+											"        \"email\": \"existing@mail.com\", \r",
+											"        \"password\": \"WrongPass123\" \r",
+											"    },\r",
+											"    \"unregistered_email\": { \r",
+											"        \"email\": \"unregistered@mail.com\", \r",
+											"        \"password\": \"Pass$50000\" \r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get the current test case (default: valid_login)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_login\";\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"const expectedStatus = {\r",
+											"    \"valid_login\": 200,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"missing_password\": 400,\r",
+											"    \"invalid_email_format\": 400,\r",
+											"    \"incorrect_password\": 401,\r",
+											"    \"unregistered_email\": 404\r",
+											"};\r",
+											"\r",
+											"// ✅ Test Case 1: Validate Status Code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// Handle successful login response\r",
+											"if (pm.response.code === 200) {\r",
+											"    // ✅ Test Case 2: Verify Success Field Value\r",
+											"    pm.test(\"Verify that the success field is true\", function () {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 3: Check Message Field Value\r",
+											"    pm.test(\"Check that the message field is 'User sign in successful'\", function () {\r",
+											"        pm.expect(response.message).to.eql(\"User sign in successful\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 4: Validate Token Field\r",
+											"    pm.test(\"Validate that the token field is present and not empty\", function () {\r",
+											"        pm.expect(response.data.token).to.be.a('string');\r",
+											"        pm.expect(response.data.token.length).to.be.greaterThan(0);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 5: Verify Expiration Timestamp Format\r",
+											"    pm.test(\"Verify that the expiration timestamp is in ISO 8601 format\", function () {\r",
+											"        let expiresIn = response.data.expiresIn;\r",
+											"        pm.expect(new Date(expiresIn).toISOString()).to.eql(expiresIn);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 6: Validate User Data Fields\r",
+											"    pm.test(\"Validate that the user data fields are correct\", function () {\r",
+											"        let user = response.data.user;\r",
+											"        \r",
+											"        pm.expect(user.id).to.not.eql(null);\r",
+											"        pm.expect(user.email).to.not.eql(null);\r",
+											"        pm.expect(user.fullName).to.not.eql(null);\r",
+											"        pm.expect(user.firstName).to.not.eql(null);\r",
+											"        pm.expect(user.lastName).to.not.eql(null);\r",
+											"    });\r",
+											"\r",
+											"    pm.environment.set(\"userId\", response.data.user.id)\r",
+											"\r",
+											"    // ✅ Test Case 7: Verify KYC Status\r",
+											"    pm.test(\"Verify that the KYC status is false\", function () {\r",
+											"        pm.expect(response.data.user.kycCompleted).to.eql(false);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 8: Validate Avatar Field\r",
+											"    pm.test(\"Validate that the avatar field is empty\", function () {\r",
+											"        pm.expect(response.data.user.avatar).to.eql(\"\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 9: Check Token Format (JWT)\r",
+											"    pm.test(\"Check that the token is in a valid JWT format\", function () {\r",
+											"        let token = response.data.token;\r",
+											"        let tokenParts = token.split('.');\r",
+											"\r",
+											"        pm.expect(tokenParts).to.have.lengthOf(3);\r",
+											"        pm.expect(tokenParts[0]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+											"        pm.expect(tokenParts[1]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+											"        pm.expect(tokenParts[2]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 10: Validate Response Time\r",
+											"    pm.test(\"Validate that the response time is less than 1000ms\", function () {\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Store Auth Token for Future Requests\r",
+											"    pm.environment.set(\"authToken\", response.data.token);\r",
+											"} \r",
+											"// Handle error cases\r",
+											"else {\r",
+											"    pm.test(\"Response contains error message\", function () {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.be.a(\"string\");\r",
+											"    });\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/signin/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"signin",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request reset password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"const expectedStatus = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"invalid_email_format\": 400,\r",
+											"    \"unregistered_email\": 404\r",
+											"};\r",
+											"\r",
+											"// ✅ Test Case 1: Validate Status Code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// Handle success case\r",
+											"if (pm.response.code === 200) {\r",
+											"    // ✅ Test Case 2: Verify Success Field\r",
+											"    pm.test(\"Verify that the success field is true\", function () {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 3: Check Message Field Value\r",
+											"    pm.test(\"Check that the message field is 'Password reset OTP sent successfully'\", function () {\r",
+											"        pm.expect(response.message).to.eql(\"Password reset OTP sent successfully\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 4: Validate OTP Code Field\r",
+											"    pm.test(\"Validate that the OTP code is present and is a 6-digit string\", function () {\r",
+											"        pm.expect(response.data).to.have.property(\"otpCode\");\r",
+											"        pm.expect(response.data.otpCode).to.match(/^\\d{6}$/);\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Test Case 5: Validate Response Time\r",
+											"    pm.test(\"Validate that the response time is less than 1000ms\", function () {\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    });\r",
+											"\r",
+											"} \r",
+											"// Handle error cases\r",
+											"else {\r",
+											"    pm.test(\"Response contains an error message\", function () {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.be.a(\"string\");\r",
+											"    });\r",
+											"\r",
+											"    // ✅ Specific Error Messages Per Test Case\r",
+											"    if (testCase === \"missing_email\") {\r",
+											"        pm.test(\"Error message should mention missing email\", function () {\r",
+											"            pm.expect(response.error).to.match(/missing.*email/i);\r",
+											"        });\r",
+											"    } \r",
+											"    else if (testCase === \"invalid_email_format\") {\r",
+											"        pm.test(\"Error message should indicate invalid email format\", function () {\r",
+											"            pm.expect(response.error).to.match(/invalid.*email/i);\r",
+											"        });\r",
+											"    } \r",
+											"    else if (testCase === \"unregistered_email\") {\r",
+											"        pm.test(\"Error message should indicate unregistered email\", function () {\r",
+											"            pm.expect(response.error).to.match(/not found|unregistered/i);\r",
+											"        });\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.environment.set(\"valid.otpCode\", response.data.otpCode)"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const testCases = {\r",
+											"    \"valid_request\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\")\r",
+											"    },\r",
+											"    \"missing_email\": { \r",
+											"        \"email\": \"\"\r",
+											"    },\r",
+											"    \"invalid_email_format\": { \r",
+											"        \"email\": \"invalid-email\"\r",
+											"    },\r",
+											"    \"unregistered_email\": { \r",
+											"        \"email\": \"unregistered@mail.com\"\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get the current test case (default: valid_request)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/password/reset",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"password",
+										"reset"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Parse JSON response\r",
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"// Expected status codes for each test case\r",
+											"const expectedStatus = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"invalid_email_format\": 400,\r",
+											"    \"unregistered_email\": 404,\r",
+											"    \"missing_otp\": 400,\r",
+											"    \"missing_password\": 400,\r",
+											"    \"invalid_otp_format\": 400,\r",
+											"    \"expired_otp\": 403,\r",
+											"    \"same_old_new_password\": 400,\r",
+											"    \"used_otp\": 403\r",
+											"};\r",
+											"\r",
+											"// ✅ Validate Status Code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// ✅ Success Case: Valid Request\r",
+											"pm.test(\"[valid_request] Should return success response\", function () {\r",
+											"    if (testCase === \"valid_request\") {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"        pm.expect(response.message).to.eql(\"Password reset successfully\");\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ✅ Error Cases: Missing or Invalid Input\r",
+											"pm.test(\"[missing_email] Should return an error for missing email\", function () {\r",
+											"    if (testCase === \"missing_email\") {\r",
+											"        pm.expect(response.error).to.match(/missing.*email/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[invalid_email_format] Should return an error for invalid email format\", function () {\r",
+											"    if (testCase === \"invalid_email_format\") {\r",
+											"        pm.expect(response.error).to.match(/invalid.*email/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[unregistered_email] Should return an error for unregistered email\", function () {\r",
+											"    if (testCase === \"unregistered_email\") {\r",
+											"        pm.expect(response.error).to.match(/not found|unregistered/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[missing_otp] Should return an error for missing OTP\", function () {\r",
+											"    if (testCase === \"missing_otp\") {\r",
+											"        pm.expect(response.error).to.match(/missing.*otp/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[invalid_otp_format] Should return an error for invalid OTP format\", function () {\r",
+											"    if (testCase === \"invalid_otp_format\") {\r",
+											"        pm.expect(response.error).to.match(/invalid.*otp/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[expired_otp] Should return an error for expired OTP\", function () {\r",
+											"    if (testCase === \"expired_otp\") {\r",
+											"        pm.expect(response.error).to.match(/expired.*otp/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[same_old_new_password] Should return an error for using the same password\", function () {\r",
+											"    if (testCase === \"same_old_new_password\") {\r",
+											"        pm.expect(response.error).to.match(/new password cannot be the same as old/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.test(\"[used_otp] Should return an error for used OTP\", function () {\r",
+											"    if (testCase === \"used_otp\") {\r",
+											"        pm.expect(response.error).to.match(/otp code has been used/i);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Generate a random new password for testing\r",
+											"const newPassword = `Pass${Math.floor(Math.random() * 10000)}`;\r",
+											"pm.environment.set(\"newPassword\", newPassword);  // Store in environment\r",
+											"\r",
+											"\r",
+											"// Define test cases with different input scenarios\r",
+											"const testCases = {\r",
+											"    \"valid_request\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": pm.environment.get(\"valid.otpCode\"),\r",
+											"        \"password\": newPassword  \r",
+											"    },\r",
+											"    \"missing_email\": { \r",
+											"        \"email\": \"\",  \r",
+											"        \"otpCode\": \"248015\",\r",
+											"        \"password\": newPassword\r",
+											"    },\r",
+											"    \"missing_otp\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": \"\",\r",
+											"        \"password\": newPassword\r",
+											"    },\r",
+											"    \"missing_password\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": \"248015\",\r",
+											"        \"password\": \"\"\r",
+											"    },\r",
+											"    \"invalid_otp_format\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": \"abcd123\",  // OTP should be numeric\r",
+											"        \"password\": newPassword\r",
+											"    },\r",
+											"    \"expired_otp\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": \"999999\",  // Simulating expired OTP\r",
+											"        \"password\": newPassword\r",
+											"    },\r",
+											"    \"unregistered_email\": { \r",
+											"        \"email\": \"unregistered@mail.com\",\r",
+											"        \"otpCode\": \"248015\",\r",
+											"        \"password\": newPassword\r",
+											"    },\r",
+											"    \"used_otp\": { \r",
+											"        \"email\": pm.environment.get(\"reg.email\"),\r",
+											"        \"otpCode\": \"123456\",  // Simulating an already used OTP\r",
+											"        \"password\": newPassword\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get the current test case from environment (default to valid_request)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"\r",
+											"// Store the selected test case payload as the request body\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											"// Log the test case for debugging in Postman Console\r",
+											"console.log(`Running test case: ${testCase}`, testCases[testCase]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/password/reset",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"password",
+										"reset"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Change password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test Case 1: Validate Status Code for Successful Password Change\r",
+											"pm.test(\"Validate that the status code is 200 for successful password change\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Test Case 2: Verify Success Message for Successful Password Change\r",
+											"pm.test(\"Verify that the success message is 'Password changed successfully' for valid old and new passwords\", function () {\r",
+											"    var jsonResponse = pm.response.json();\r",
+											"    pm.expect(jsonResponse.success).to.eql(true);\r",
+											"    pm.expect(jsonResponse.message).to.eql(\"Password changed successfully\");\r",
+											"});\r",
+											"\r",
+											"// Test Case 3: Check Response Format for Successful Password Change\r",
+											"pm.test(\"Check that the response format contains 'success' and 'message' fields for a successful password change\", function () {\r",
+											"    var jsonResponse = pm.response.json();\r",
+											"    pm.expect(jsonResponse).to.have.all.keys(\"success\", \"message\");\r",
+											"    pm.expect(jsonResponse.success).to.be.a('boolean');\r",
+											"    pm.expect(jsonResponse.message).to.be.a('string');\r",
+											"});\r",
+											"\r",
+											"// Test Case 4: Validate Status Code for Incorrect Old Password\r",
+											"pm.test(\"Validate that the status code is 400 for incorrect old password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"incorrectOldPassword\", \"newPassword\": \"newpassword123.\"}'; // Incorrect old password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Incorrect old password\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 5: Verify Error Message for Incorrect Old Password\r",
+											"pm.test(\"Verify that the error message is 'Incorrect old password' for wrong old password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"incorrectOldPassword\", \"newPassword\": \"newpassword123.\"}'; // Incorrect old password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Incorrect old password\");\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 6: Validate Status Code for Weak New Password\r",
+											"pm.test(\"Validate that the status code is 400 for weak new password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"123\"}'; // Weak new password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"New password does not meet security requirements\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 7: Verify Error Message for Weak New Password\r",
+											"pm.test(\"Verify that the error message is 'New password does not meet security requirements' for weak new password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"123\"}'; // Weak new password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"New password does not meet security requirements\");\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 8: Verify Status Code for Missing New Password Field\r",
+											"pm.test(\"Verify that the status code is 400 for missing new password field in the request body\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\"}'; // Missing new password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"New password is required\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 9: Verify Status Code for Missing Old Password Field\r",
+											"pm.test(\"Verify that the status code is 400 for missing old password field in the request body\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"newPassword\": \"newpassword123.\"}'; // Missing old password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Old password is required\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 10: Validate Status Code for Missing Email Field\r",
+											"pm.test(\"Validate that the status code is 400 for missing email field in the request body\", function () {\r",
+											"    pm.request.body.raw = '{\"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"newpassword123.\"}'; // Missing email\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Email field is required\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 11: Verify Response for Non-Existent Email Address\r",
+											"pm.test(\"Verify that the response is correct for a non-existent email address in password change request\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"nonexistentemail@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"newpassword123.\"}'; // Non-existent email\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(404);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Email address not found\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 12: Check Response for Password Change with Special Characters\r",
+											"pm.test(\"Check that the system handles special characters in the new password correctly\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"new@password#2025!\"}'; // New password with special characters\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(200);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(true);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Password changed successfully\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 13: Validate Password Change Response Time\r",
+											"pm.test(\"Validate that the response time for password change is less than 500ms\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"newpassword123.\"}'; // Valid request\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.expect(res.responseTime).to.be.below(1000);\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 14: Verify that Old Password Cannot Be Reused as New Password\r",
+											"pm.test(\"Verify that the old password cannot be reused as the new password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"notarealpassword10.\", \"newPassword\": \"notarealpassword10.\"}'; // New password is the same as old\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"New password must be different from the old password\");\r",
+											"    });\r",
+											"});\r",
+											"\r",
+											"// Test Case 15: Verify Password Change with Same Email But Different Old Password\r",
+											"pm.test(\"Verify password change with same email but incorrect old password\", function () {\r",
+											"    pm.request.body.raw = '{\"email\": \"tesade9636@godsigma.com\", \"oldPassword\": \"wrongOldPassword\", \"newPassword\": \"newvalidpassword123.\"}'; // Incorrect old password\r",
+											"    pm.sendRequest(pm.request, function (err, res) {\r",
+											"        pm.response.to.have.status(400);\r",
+											"        var jsonResponse = res.json();\r",
+											"        pm.expect(jsonResponse.success).to.eql(false);\r",
+											"        pm.expect(jsonResponse.message).to.eql(\"Incorrect old password\");\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// ✅ Generate a new password dynamically\r",
+											"const newPassword = `Pass${Math.floor(1000 + Math.random() * 9000)}`; // Ensures a 4-digit random number\r",
+											"\r",
+											"// ✅ Store the new password in the environment variable\r",
+											"pm.environment.set(\"reg.pass\", newPassword);\r",
+											"\r",
+											"// ✅ Retrieve stored email and old password\r",
+											"const email = pm.environment.get(\"reg.email\");\r",
+											"const oldPassword = pm.environment.get(\"newPassword\") || \"DefaultOldPass$123\";  // Use default if missing\r",
+											"\r",
+											"// ✅ Define multiple test cases\r",
+											"const testCases = {\r",
+											"    \"valid_request\": { \r",
+											"        \"email\": email,\r",
+											"        \"oldPassword\": oldPassword,\r",
+											"        \"newPassword\": newPassword\r",
+											"    },\r",
+											"    \"missing_email\": { \r",
+											"        \"email\": \"\",\r",
+											"        \"oldPassword\": oldPassword,\r",
+											"        \"newPassword\": newPassword\r",
+											"    },\r",
+											"    \"missing_old_password\": { \r",
+											"        \"email\": email,\r",
+											"        \"oldPassword\": \"\",\r",
+											"        \"newPassword\": newPassword\r",
+											"    },\r",
+											"    \"missing_new_password\": { \r",
+											"        \"email\": email,\r",
+											"        \"oldPassword\": oldPassword,\r",
+											"        \"newPassword\": \"\"\r",
+											"    },\r",
+											"    \"same_old_new_password\": { \r",
+											"        \"email\": email,\r",
+											"        \"oldPassword\": oldPassword,\r",
+											"        \"newPassword\": oldPassword  // Ensures old and new passwords are the same\r",
+											"    },\r",
+											"    \"incorrect_old_password\": { \r",
+											"        \"email\": email,\r",
+											"        \"oldPassword\": \"WrongPass$000\",  // Intentionally incorrect\r",
+											"        \"newPassword\": newPassword\r",
+											"    },\r",
+											"    \"unregistered_email\": { \r",
+											"        \"email\": \"unknownuser@mail.com\",\r",
+											"        \"oldPassword\": oldPassword,\r",
+											"        \"newPassword\": newPassword\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// ✅ Get test case from environment or default to valid request\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// ✅ Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											"// ✅ Log output for debugging\r",
+											"console.log(`Running test case: ${testCase}`, testCases[testCase]);\r",
+											"console.log(`New password generated and stored: ${newPassword}`);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/password/change",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"password",
+										"change"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Request email confirmation",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Define test cases for different input scenarios\r",
+											"const testCases = {\r",
+											"    \"valid_request\": {\r",
+											"    \"email\": pm.environment.get(\"reg.email\")\r",
+											"},\r",
+											"    \"missing_email\": { \r",
+											"        \"email\": \"\"  // No email provided\r",
+											"    },\r",
+											"    \"invalid_email_format\": { \r",
+											"        \"email\": \"invalid-email\"  // Invalid email format\r",
+											"    },\r",
+											"    \"unregistered_email\": { \r",
+											"        \"email\": \"unknownuser@mail.com\"  // Email not in system\r",
+											"    },\r",
+											"    \"already_confirmed_email\": { \r",
+											"        \"email\": \"testog@e-record.com\"  // Email not in system\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get the current test case from environment (default to valid_request)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"\r",
+											"// Store the selected test case payload as the request body\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"\r",
+											"// Set request headers for tracking\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											"// Log the test case for debugging in Postman Console\r",
+											"console.log(`Running test case: ${testCase}`, testCases[testCase]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Parse response\r",
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"// Expected status codes\r",
+											"const expectedStatusCodes = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"invalid_email_format\": 400,\r",
+											"    \"unregistered_email\": 404\r",
+											"};\r",
+											"\r",
+											"// ✅ Validate Status Code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatusCodes[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatusCodes[testCase]);\r",
+											"});\r",
+											"\r",
+											"// ✅ Success Scenario (valid request)\r",
+											"pm.test(\"[valid_request] Verify success response\", function () {\r",
+											"    if (testCase === \"valid_request\") {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"        pm.expect(response.message).to.include(\"confirmation request sent successfully\");\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ❌ Error Scenario: Missing Email\r",
+											"pm.test(\"[missing_email] Error should mention missing email\", function () {\r",
+											"    if (testCase === \"missing_email\") {\r",
+											"        pm.expect(response.error).to.match(/missing.*email/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ❌ Error Scenario: Invalid Email Format\r",
+											"pm.test(\"[invalid_email_format] Error should indicate invalid email format\", function () {\r",
+											"    if (testCase === \"invalid_email_format\") {\r",
+											"        pm.expect(response.error).to.match(/invalid.*email/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ❌ Error Scenario: Unregistered Email\r",
+											"pm.test(\"[unregistered_email] Error should indicate unregistered email\", function () {\r",
+											"    if (testCase === \"unregistered_email\") {\r",
+											"        pm.expect(response.error).to.match(/not found|unregistered/i);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/confirmation/request/email",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"confirmation",
+										"request",
+										"email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Email confirmation",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Define Mail.tm API endpoints\r",
+											"const mailTmBaseUrl = \"https://api.mail.tm\";\r",
+											"const userEmail = pm.environment.get(\"test.email\");  // Ensure you've set this in Postman\r",
+											"const userPassword = pm.environment.get(\"email_password\");  // Ensure this is set in Postman\r",
+											"\r",
+											"// Step 1: Get authentication token for Mail.tm\r",
+											"pm.sendRequest({\r",
+											"    url: `${mailTmBaseUrl}/token`,\r",
+											"    method: \"POST\",\r",
+											"    header: { \"Content-Type\": \"application/json\" },\r",
+											"    body: {\r",
+											"        mode: \"raw\",\r",
+											"        raw: JSON.stringify({\r",
+											"            address: userEmail,\r",
+											"            password: userPassword\r",
+											"        })\r",
+											"    }\r",
+											"}, function (err, res) {\r",
+											"    if (err) {\r",
+											"        console.error(\"Mail.tm Auth Error:\", err);\r",
+											"        return;\r",
+											"    }\r",
+											"\r",
+											"    let token = res.json().token;\r",
+											"    pm.environment.set(\"mailTmToken\", token); // Store token\r",
+											"\r",
+											"    // Step 2: Fetch the latest email\r",
+											"    pm.sendRequest({\r",
+											"        url: `${mailTmBaseUrl}/messages`,\r",
+											"        method: \"GET\",\r",
+											"        header: { \"Authorization\": `Bearer ${token}` }\r",
+											"    }, function (err, res) {\r",
+											"        if (err) {\r",
+											"            console.error(\"Mail.tm Message Fetch Error:\", err);\r",
+											"            return;\r",
+											"        }\r",
+											"\r",
+											"       let messages = res.json()[\"hydra:member\"];\r",
+											"        if (!messages.length) {\r",
+											"            console.warn(\"No OTP emails found.\");\r",
+											"            return;\r",
+											"        }\r",
+											"\r",
+											"        let latestMessageId = messages[0].id; // Get latest message ID\r",
+											"\r",
+											"        // Step 3: Retrieve the OTP from the latest email\r",
+											"        pm.sendRequest({\r",
+											"            url: `${mailTmBaseUrl}/messages/${latestMessageId}`,\r",
+											"            method: \"GET\",\r",
+											"            header: { \"Authorization\": `Bearer ${token}` }\r",
+											"        }, function (err, res) {\r",
+											"            if (err) {\r",
+											"                console.error(\"Mail.tm OTP Extraction Error:\", err);\r",
+											"                return;\r",
+											"            }\r",
+											"\r",
+											"            let emailBody = res.json().text;  \r",
+											"            let otpMatch = emailBody.match(/\\b\\d{6}\\b/);  // Extract the 6-digit OTP\r",
+											"            if (otpMatch) {\r",
+											"                let otpCode = otpMatch[0];\r",
+											"                pm.environment.set(\"retrievedOTP\", otpCode);\r",
+											"                console.log(`✅ OTP Retrieved: ${otpCode}`);\r",
+											"            } else {\r",
+											"                console.warn(\"OTP not found in email body.\");\r",
+											"            }\r",
+											"        });\r",
+											"    });\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Verify OTP confirmation response\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"\r",
+											"    let response;\r",
+											"    try {\r",
+											"        response = pm.response.json();\r",
+											"    } catch (e) {\r",
+											"        pm.test(\"Response is a valid JSON\", function () {\r",
+											"            pm.expect(false, \"Invalid JSON response\").to.be.true;\r",
+											"        });\r",
+											"        return; // Stop execution if JSON parsing fails\r",
+											"    }\r",
+											"\r",
+											"    let statusCode = pm.response.code;\r",
+											"\r",
+											"    if (statusCode === 200) {\r",
+											"        // ✅ Success Case: OTP confirmed successfully\r",
+											"        pm.test(\"Status code is 200 (OK)\", function () {\r",
+											"            pm.response.to.have.status(200);\r",
+											"        });\r",
+											"\r",
+											"        pm.test(\"OTP confirmation success message\", function () {\r",
+											"            pm.expect(response.success).to.eql(true);\r",
+											"            pm.expect(response.message).to.match(/successfully confirmed/i);\r",
+											"        });\r",
+											"    } else if (statusCode === 409) {\r",
+											"        // ❌ Error Case: Email already confirmed\r",
+											"        pm.test(\"Status code is 409 (Conflict)\", function () {\r",
+											"            pm.response.to.have.status(409);\r",
+											"        });\r",
+											"\r",
+											"        pm.test(\"Error message for already confirmed email\", function () {\r",
+											"            pm.expect(response.success).to.eql(false);\r",
+											"            pm.expect(response.message).to.eql(\"Email has already been confirmed\");\r",
+											"        });\r",
+											"    } else {\r",
+											"        // ⚠️ Handle unexpected status codes\r",
+											"        pm.test(`Unexpected status code: ${statusCode}`, function () {\r",
+											"            pm.expect(false, `Unexpected response status: ${statusCode}`).to.be.true;\r",
+											"        });\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"{{test.email}}\",\n    \"otpCode\": \"{{retrievedOTP}}\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/auth/confirmation/email",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"auth",
+										"confirmation",
+										"email"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update user",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// ✅ Ensure Authorization Token is Set\r",
+											"if (!pm.environment.get(\"authToken\")) {\r",
+											"    throw new Error(\"Authorization token is missing! Please log in and set the 'authToken' in environment variables.\");\r",
+											"}\r",
+											"\r",
+											"// ✅ Set Authorization Header\r",
+											"pm.request.headers.add({\r",
+											"    key: \"Authorization\",\r",
+											"    value: `Bearer ${pm.environment.get(\"authToken\")}`\r",
+											"});\r",
+											"\r",
+											"function getRandomNames() {\r",
+											"    const names = [\r",
+											"        \"James\", \"Mary\", \"John\", \"Patricia\", \"Robert\", \"Jennifer\", \"Ben\", \r",
+											"        \"Michael\", \"Linda\", \"William\", \"Elizabeth\", \"David\", \"Johnson\", \r",
+											"        \"Richard\", \"Fydel\", \"Joseph\", \"Jessica\", \"Thomas\", \"Sarah\", \"Ojay\", \"Rodri\",\r",
+											"        \"Charles\", \"Karen\", \"Christopher\", \"Lisa\", \"Daniel\", \"Nancy\", \"Walter\",\r",
+											"        \"Friedrich\", \"Betty\", \"Anthony\", \"Margaret\", \"Mark\", \"Sandra\", \"James\"\r",
+											"    ];\r",
+											"\r",
+											"    let firstName = names[Math.floor(Math.random() * names.length)];\r",
+											"    let lastName = names[Math.floor(Math.random() * names.length)];\r",
+											"\r",
+											"    while (firstName === lastName) {\r",
+											"        lastName = names[Math.floor(Math.random() * names.length)];\r",
+											"    }\r",
+											"\r",
+											"    return { firstName, lastName };\r",
+											"}\r",
+											"\r",
+											"const { firstName: randomFirstName, lastName: randomLastName } = getRandomNames();\r",
+											"const testPhoneNumber = `0813${Math.floor(1000000 + Math.random() * 9000000)}`;\r",
+											"\r",
+											"const testCases = {\r",
+											"    \"valid_request\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"phone\": testPhoneNumber\r",
+											"    },\r",
+											"    \"missing_firstName\": { \r",
+											"        \"firstName\": \"\", \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"phone\": testPhoneNumber\r",
+											"    },\r",
+											"    \"missing_lastName\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": \"\", \r",
+											"        \"phone\": testPhoneNumber\r",
+											"    },\r",
+											"    \"missing_phone\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"phone\": \"\"\r",
+											"    },\r",
+											"    \"duplicate_phone\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"phone\": pm.environment.get(\"existing.phone\") // Assume this exists\r",
+											"    },\r",
+											"    \"invalid_phone_format\": { \r",
+											"        \"firstName\": randomFirstName, \r",
+											"        \"lastName\": randomLastName, \r",
+											"        \"phone\": \"abcd12345\"\r",
+											"    },\r",
+											"    \"special_characters\": { \r",
+											"        \"firstName\": \"John@Doe\", \r",
+											"        \"lastName\": \"Jane#Smith\", \r",
+											"        \"phone\": testPhoneNumber\r",
+											"    },\r",
+											"    \"unauthorized_request\": null  // Simulate request without authorization\r",
+											"};\r",
+											"\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"\r",
+											"// ✅ Store the selected test case payload as the request body (except for unauthorized request)\r",
+											"if (testCase !== \"unauthorized_request\") {\r",
+											"    pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+											"} else {\r",
+											"    pm.request.headers.remove(\"Authorization\"); // Simulate unauthorized request\r",
+											"}\r",
+											"\r",
+											"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											"console.log(`Running test case: ${testCase}`, testCases[testCase]);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let response = pm.response.json();\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+											"\r",
+											"// Expected status codes\r",
+											"const expectedStatus = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_firstName\": 400,\r",
+											"    \"missing_lastName\": 400,\r",
+											"    \"missing_phone\": 400,\r",
+											"    \"duplicate_phone\": 409,\r",
+											"    \"invalid_phone_format\": 400,\r",
+											"    \"sql_injection\": 400,\r",
+											"    \"long_names\": 400,\r",
+											"    \"special_characters\": 400\r",
+											"};\r",
+											"\r",
+											"// ✅ Status Code Validation\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// ✅ Success Case\r",
+											"if (pm.response.code === 200) {\r",
+											"    pm.test(\"Success flag should be true\", function () {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"    });\r",
+											"\r",
+											"    pm.test(\"Verify that response message confirms update\", function () {\r",
+											"        pm.expect(response.message).to.match(/updated successfully/i);\r",
+											"    });\r",
+											"\r",
+											"    pm.test(\"Response time should be < 500ms\", function () {\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    });\r",
+											"\r",
+											"} else {\r",
+											"    // ✅ Error Handling for each test case\r",
+											"    pm.test(\"Response contains an error message\", function () {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.be.a(\"string\");\r",
+											"    });\r",
+											"\r",
+											"    const errorMessages = {\r",
+											"        \"missing_firstName\": /missing.*first name/i,\r",
+											"        \"missing_lastName\": /missing.*last name/i,\r",
+											"        \"missing_phone\": /missing.*phone/i,\r",
+											"        \"duplicate_phone\": /already exists|duplicate phone/i,\r",
+											"        \"invalid_phone_format\": /invalid.*phone/i,\r",
+											"        \"special_characters\": /invalid.*characters/i\r",
+											"    };\r",
+											"\r",
+											"    if (errorMessages[testCase]) {\r",
+											"        pm.test(`Error message should match expected pattern for ${testCase}`, function () {\r",
+											"            pm.expect(response.error).to.match(errorMessages[testCase]);\r",
+											"        });\r",
+											"    }\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete user",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// ✅ Define test cases with different scenarios\r",
+											"const testCases = {\r",
+											"    \"valid_request\": {}, // No special changes; uses valid token\r",
+											"    \"missing_token\": { token: \"\" }, // Simulate a request with no token\r",
+											"    \"invalid_token\": { token: \"invalid_token_value\" }, // Simulate an expired/invalid token\r",
+											"    \"non_existent_user\": { token: pm.environment.get(\"valid.token\") } // Valid token, but user does not exist\r",
+											"};\r",
+											"\r",
+											"// ✅ Get the current test case (default: valid_request)\r",
+											"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+											"let testData = testCases[testCase];\r",
+											"\r",
+											"// ✅ Set the authorization token dynamically\r",
+											"if (testData.token !== undefined) {\r",
+											"    pm.request.headers.upsert({ key: \"Authorization\", value: `Bearer ${testData.token}` });\r",
+											"} else {\r",
+											"    pm.request.headers.upsert({ key: \"Authorization\", value: `Bearer ${pm.environment.get(\"valid.token\")}` });\r",
+											"}\r",
+											"\r",
+											"// ✅ Set test case header for tracking\r",
+											"pm.request.headers.upsert({ key: \"Test-Case\", value: testCase });\r",
+											"\r",
+											"// ✅ Log the test case for debugging\r",
+											"console.log(`Running test case: ${testCase}`, testData);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// ✅ Parse response JSON safely\r",
+											"let response = {};\r",
+											"try {\r",
+											"    response = pm.response.json();\r",
+											"} catch (e) {\r",
+											"    console.error(\"Response is not in JSON format\", e);\r",
+											"}\r",
+											"\r",
+											"// ✅ Retrieve test case from request headers or environment\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\") || pm.environment.get(\"testCase\");\r",
+											"\r",
+											"// ✅ Define expected status codes\r",
+											"const expectedStatus = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_token\": 401,\r",
+											"    \"invalid_token\": 403,\r",
+											"    \"non_existent_user\": 404\r",
+											"};\r",
+											"\r",
+											"// ✅ Log test case for debugging\r",
+											"console.log(`Running test case: ${testCase}`);\r",
+											"\r",
+											"// ✅ Validate the status code\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+											"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Successful User Deletion (200 OK)\r",
+											"pm.test(\"[valid_request] User Account should be deleted successfully\", function () {\r",
+											"    if (testCase === \"valid_request\") {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"        pm.expect(response.message).to.eql(\"Account deleted successfully\");\r",
+											"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Missing Access Token (401 Unauthorized)\r",
+											"pm.test(\"[missing_token] Request should fail due to missing token\", function () {\r",
+											"    if (testCase === \"missing_token\") {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.match(/missing.*token/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Invalid or Expired Token (403 Forbidden)\r",
+											"pm.test(\"[invalid_token] Request should fail due to invalid token\", function () {\r",
+											"    if (testCase === \"invalid_token\") {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.match(/invalid|expired.*token/i);\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Non-Existent User (404 Not Found)\r",
+											"pm.test(\"[non_existent_user] Request should fail when the user does not exist\", function () {\r",
+											"    if (testCase === \"non_existent_user\") {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.match(/user does not exist/i);\r",
+											"    }\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{authToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "notification",
+			"item": [
+				{
+					"name": "Contact us notifications",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// ✅ Define test cases with various input scenarios\r",
+									"const testCases = {\r",
+									"    \"valid_request\": { \r",
+									"        \"name\": \"John Doe\",\r",
+									"        \"email\": pm.environment.get(\"reg.email\") || \"johndoe@example.com\",\r",
+									"        \"subject\": \"Inquiry about services\",\r",
+									"        \"message\": \"I would like to know more about your offerings.\"\r",
+									"    },\r",
+									"    \"missing_name\": { \r",
+									"        \"email\": \"johndoe@example.com\",\r",
+									"        \"subject\": \"Inquiry about services\",\r",
+									"        \"message\": \"I would like to know more about your offerings.\"\r",
+									"    },\r",
+									"    \"missing_email\": { \r",
+									"        \"name\": \"John Doe\",\r",
+									"        \"subject\": \"Inquiry about services\",\r",
+									"        \"message\": \"I would like to know more about your offerings.\"\r",
+									"    },\r",
+									"    \"invalid_email_format\": { \r",
+									"        \"name\": \"John Doe\",\r",
+									"        \"email\": \"invalid-email\",\r",
+									"        \"subject\": \"Inquiry about services\",\r",
+									"        \"message\": \"I would like to know more about your offerings.\"\r",
+									"    },\r",
+									"    \"missing_subject\": { \r",
+									"        \"name\": \"John Doe\",\r",
+									"        \"email\": \"johndoe@example.com\",\r",
+									"        \"message\": \"I would like to know more about your offerings.\"\r",
+									"    },\r",
+									"    \"missing_message\": { \r",
+									"        \"name\": \"John Doe\",\r",
+									"        \"email\": \"johndoe@example.com\",\r",
+									"        \"subject\": \"Inquiry about services\"\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"// ✅ Get the current test case from environment (default to valid_request)\r",
+									"let testCase = pm.environment.get(\"testCase\") || \"valid_request\";\r",
+									"\r",
+									"// ✅ Store the selected test case payload as the request body\r",
+									"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+									"\r",
+									"// ✅ Set request headers for tracking test cases\r",
+									"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+									"\r",
+									"// ✅ Log the test case for debugging in Postman Console\r",
+									"console.log(`Running test case: ${testCase}`, testCases[testCase]);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Parse JSON response\r",
+									"let response = pm.response.json();\r",
+									"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+									"\r",
+									"// ✅ Expected status codes for each test case\r",
+									"const expectedStatus = {\r",
+									"    \"valid_request\": 200,\r",
+									"    \"missing_name\": 400,\r",
+									"    \"missing_email\": 400,\r",
+									"    \"invalid_email_format\": 400,\r",
+									"    \"missing_message\": 400\r",
+									"};\r",
+									"\r",
+									"// ✅ Validate HTTP status code\r",
+									"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+									"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+									"});\r",
+									"\r",
+									"// ✅ Success Case Handling (200 OK)\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Verify that the success field is true\", function () {\r",
+									"        pm.expect(response.success).to.eql(true);\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Check that the message field confirms successful submission\", function () {\r",
+									"        pm.expect(response.message).to.include(\"successfully\");\r",
+									"    });\r",
+									"\r",
+									"    pm.test(\"Validate response time is below 500ms\", function () {\r",
+									"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"    });\r",
+									"\r",
+									"} else {\r",
+									"    // ✅ Error Case Handling\r",
+									"    pm.test(\"Response contains an error message\", function () {\r",
+									"        pm.expect(response).to.have.property(\"error\");\r",
+									"        pm.expect(response.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Specific Error Messages Per Test Case\r",
+									"    const errorMessages = {\r",
+									"        \"missing_name\": \"Name is required\",\r",
+									"        \"missing_email\": \"Email is required\",\r",
+									"        \"invalid_email_format\": \"Invalid email format\",\r",
+									"        \"missing_message\": \"Message is required\"\r",
+									"    };\r",
+									"\r",
+									"    if (errorMessages[testCase]) {\r",
+									"        pm.test(`Error message should mention '${errorMessages[testCase]}'`, function () {\r",
+									"            pm.expect(response.error).to.match(new RegExp(errorMessages[testCase], \"i\"));\r",
+									"        });\r",
+									"    }\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"tesade9636@godsi.com\",\n    \"name\":\"jondoe\",\n    \"message\":\"hello tomorrow\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/notifications/contact-us",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"contact-us"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "Admin Sign-in",
+					"item": [
+						{
+							"name": "signin",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Ensure required environment variables exist\r",
+											"const adminEmail = (pm.environment.get(\"admin.email\") || \"testog@e-record.com\").trim();\r",
+											"const adminPassword = (pm.environment.get(\"admin.password\") || \"Pass@12345\").trim();\r",
+											"\r",
+											"if (!adminEmail || !adminPassword) {\r",
+											"    console.warn(\"⚠️ Warning: 'admin.email' or 'admin.password' is missing in environment variables.\");\r",
+											"}\r",
+											"\r",
+											"// Define test cases with sanitized values\r",
+											"const testCases = {\r",
+											"    \"valid_request\": {\r",
+											"        \"email\": adminEmail,\r",
+											"        \"password\": adminPassword\r",
+											"    },\r",
+											"    \"missing_email\": {\r",
+											"        \"email\": \"\",\r",
+											"        \"password\": adminPassword\r",
+											"    },\r",
+											"    \"missing_password\": {\r",
+											"        \"email\": adminEmail,\r",
+											"        \"password\": \"\"\r",
+											"    },\r",
+											"    \"invalid_credentials\": {\r",
+											"        \"email\": \"invalid@admin.com\",\r",
+											"        \"password\": \"wrongpassword123\"\r",
+											"    }\r",
+											"};\r",
+											"\r",
+											"// Get test case from environment or use default\r",
+											"let testCase = (pm.environment.get(\"testCase\") || \"valid_request\").trim();\r",
+											"\r",
+											"if (!testCases.hasOwnProperty(testCase)) {\r",
+											"    console.error(`❌ Error: Test case '${testCase}' not found! Defaulting to 'valid_request'.`);\r",
+											"    testCase = \"valid_request\";\r",
+											"}\r",
+											"\r",
+											"// Set and verify the test payload\r",
+											"const requestBody = JSON.stringify(testCases[testCase]); // Ensure proper JSON format\r",
+											"pm.environment.set(\"currentPayload\", requestBody);\r",
+											"\r",
+											"// Debug output\r",
+											"console.log(`✅ Running test case: ${testCase}`, testCases[testCase]);\r",
+											"console.log(\"🟢 Final request payload stored in environment:\", pm.environment.get(\"currentPayload\"));\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Parse JSON response\r",
+											"let response;\r",
+											"try {\r",
+											"    response = pm.response.json();\r",
+											"} catch (e) {\r",
+											"    pm.test(\"Response should be valid JSON\", () => {\r",
+											"        pm.expect.fail(\"Response is not in JSON format\");\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// Capture the test case from headers\r",
+											"let testCase = pm.request.headers.get(\"Test-Case\") || \"valid_request\";\r",
+											"\r",
+											"// Define expected status codes for test cases\r",
+											"const expectedStatus = {\r",
+											"    \"valid_request\": 200,\r",
+											"    \"missing_email\": 400,\r",
+											"    \"missing_password\": 400,\r",
+											"    \"invalid_credentials\": 401\r",
+											"};\r",
+											"\r",
+											"// Ensure status code is as expected\r",
+											"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, () => {\r",
+											"    pm.expect(pm.response.code).to.eql(expectedStatus[testCase]);\r",
+											"});\r",
+											"\r",
+											"// Success Case: 200 OK\r",
+											"if (pm.response.code === 200) {\r",
+											"    pm.test(\"Success should be true\", () => {\r",
+											"        pm.expect(response.success).to.eql(true);\r",
+											"    });\r",
+											"\r",
+											"    pm.test(\"Response contains auth token\", () => {\r",
+											"        pm.expect(response.data).to.have.property(\"token\");\r",
+											"    });\r",
+											"\r",
+											"    pm.test(\"Store auth token for future requests\", () => {\r",
+											"        pm.environment.set(\"adminAuthToken\", response.data.token);\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// Error Case: Response should contain an error message\r",
+											"if (pm.response.code !== 200) {\r",
+											"    pm.test(\"Response should contain an error message\", () => {\r",
+											"        pm.expect(response).to.have.property(\"error\");\r",
+											"        pm.expect(response.error).to.be.a(\"string\");\r",
+											"    });\r",
+											"\r",
+											"    // Specific Error Messages\r",
+											"    if (testCase === \"missing_email\") {\r",
+											"        pm.test(\"Error message should mention missing email\", () => {\r",
+											"            pm.expect(response.error).to.match(/missing.*email/i);\r",
+											"        });\r",
+											"    } else if (testCase === \"missing_password\") {\r",
+											"        pm.test(\"Error message should mention missing password\", () => {\r",
+											"            pm.expect(response.error).to.match(/missing.*password/i);\r",
+											"        });\r",
+											"    } else if (testCase === \"invalid_credentials\") {\r",
+											"        pm.test(\"Error message should indicate invalid credentials\", () => {\r",
+											"            pm.expect(response.error).to.match(/invalid.*credentials/i);\r",
+											"        });\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"// Response time check\r",
+											"pm.test(\"Response time should be under 500ms\", () => {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n     \"email\": \"testog@e-record.com\",\n    \"password\": \"Pass@12345\"\n}\n\n// {{ADMcurrentPayload}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/signin",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"signin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "dashboard",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Ensure response is in JSON format\r",
+											"pm.test(\"Response is valid JSON\", function () {\r",
+											"    pm.response.to.be.json;\r",
+											"});\r",
+											"\r",
+											"// Parse response JSON safely\r",
+											"let jsonData;\r",
+											"try {\r",
+											"    jsonData = pm.response.json();\r",
+											"} catch (e) {\r",
+											"    pm.test(\"Response is valid JSON\", function () {\r",
+											"        pm.expect(false).to.be.true; // Force failure if parsing fails\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// Validate required fields in the response\r",
+											"pm.test(\"Response contains expected fields\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"success\");\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData).to.have.property(\"data\");\r",
+											"});\r",
+											"\r",
+											"// Ensure `data.allUsers` exists and is an array before accessing it\r",
+											"pm.test(\"allUsers array exists\", function () {\r",
+											"    pm.expect(jsonData.data).to.have.property(\"allUsers\");\r",
+											"    pm.expect(jsonData.data.allUsers).to.be.an(\"array\").that.is.not.empty;\r",
+											"});\r",
+											"\r",
+											"// Validate user data while excluding sensitive fields\r",
+											"if (jsonData.data.allUsers.length > 0) {\r",
+											"    let userData = jsonData.data.allUsers[0];\r",
+											"\r",
+											"    pm.test(\"User data contains required fields\", function () {\r",
+											"        pm.expect(userData).to.have.property(\"id\");\r",
+											"        pm.expect(userData).to.have.property(\"email\");\r",
+											"        pm.expect(userData).to.have.property(\"firstName\");\r",
+											"        pm.expect(userData).to.have.property(\"lastName\");\r",
+											"        pm.expect(userData).to.have.property(\"password\");\r",
+											"    \r",
+											"    });\r",
+											"} else {\r",
+											"    pm.test(\"allUsers is empty\", function () {\r",
+											"        pm.expect(false).to.be.true; // Fails if users list is unexpectedly empty\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// Validate response status code\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/dashboard",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"dashboard"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Get user by ID",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Ensure response status code is 200\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Ensure response is JSON\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"// Parse response JSON\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// Validate success field\r",
+											"pm.test(\"Response success flag is true\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+											"});\r",
+											"\r",
+											"// Validate message field\r",
+											"pm.test(\"Response message is correct\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\", \"Users fetched successfully\");\r",
+											"});\r",
+											"\r",
+											"// Validate user data structure\r",
+											"pm.test(\"Response contains expected user fields\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"data\");\r",
+											"    let userData = jsonData.data;\r",
+											"\r",
+											"    pm.expect(userData).to.have.property(\"id\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"firstName\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"lastName\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"fullName\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"email\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"avatar\").that.is.a(\"string\");\r",
+											"    pm.expect(userData).to.have.property(\"username\"); // Can be null\r",
+											"    pm.expect(userData).to.have.property(\"isActive\").that.is.a(\"boolean\");\r",
+											"});\r",
+											"\r",
+											"// Validate adminAuthToken is present in request headers\r",
+											"pm.test(\"Auth token is provided\", function () {\r",
+											"    pm.expect(pm.request.headers.has(\"Authorization\")).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"UserId\", jsonData.data.id)"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/users/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users",
+										":id"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "ec73234f-5419-4953-855b-2c4c21307b67",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "ec73234f-5419-4953-855b-2c4c21307b67"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validate response status code\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Validate response format\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"// Parse response JSON\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// Validate required response fields\r",
+											"pm.test(\"Response contains expected fields\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"    pm.expect(jsonData).to.have.property(\"data\");\r",
+											"});\r",
+											"\r",
+											"// Validate user data structure (assuming data is an array of users)\r",
+											"pm.test(\"User data structure is correct\", function () {\r",
+											"    pm.expect(jsonData.data.result).to.be.an(\"array\");\r",
+											"\r",
+											"    if (jsonData.data.result.length > 0) {\r",
+											"        let user = jsonData.data.result[0]; // Check the first user\r",
+											"\r",
+											"        pm.expect(user).to.have.property(\"id\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"firstName\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"lastName\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"fullName\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"email\").that.is.a(\"string\");\r",
+											"        pm.expect(user).to.have.property(\"avatar\");\r",
+											"        pm.expect(user).to.have.property(\"username\");\r",
+											"        pm.expect(user).to.have.property(\"isActive\").that.is.a(\"boolean\");\r",
+											"    };\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/users",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "make user admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Response status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response time is less than 800ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(800);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body has 'success' field set to true\", function () {\r",
+											"    pm.expect(pm.response.json().success).to.be.true;\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body has 'message' field with value 'User profile updated successfully.'\", function () {\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"User profile updated successfully.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "x-access-token",
+										"value": "{{token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"testog@e-record.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/make-user-admin",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"make-user-admin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "make admin user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Validate response status code\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Validate response format\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"// Parse response JSON\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// Validate required response fields\r",
+											"pm.test(\"Response contains expected fields\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+											"    pm.expect(jsonData).to.have.property(\"message\");\r",
+											"});\r",
+											"\r",
+											"// Validate message in the response\r",
+											"pm.test(\"Message in the response is 'User profile updated successfully.'\", function () {\r",
+											"    pm.expect(jsonData.message).to.equal(\"User profile updated successfully.\");\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"testog@e-record.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/make-admin-user",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"make-admin-user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "suspend user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/user/suspend",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"user",
+										"suspend"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "unsuspend user",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\r\n//     \"email\": \"testog@e-record.com\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/user/unsuspend/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"user",
+										"unsuspend",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "ec73234f-5419-4953-855b-2c4c21307b67"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "config",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test for the status code\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Test for response time\r",
+											"pm.test(\"Response time is less than 500ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(500);\r",
+											"});\r",
+											"\r",
+											"// Test for response body properties\r",
+											"pm.test(\"Response body has required properties\", function () {\r",
+											"    pm.response.to.have.jsonBody('success');\r",
+											"    pm.response.to.have.jsonBody('message');\r",
+											"    pm.response.to.have.jsonBody('data');\r",
+											"});\r",
+											"\r",
+											"// Test for specific values in the response body\r",
+											"pm.test(\"Success is true and message is 'Config fetched successfully.'\", function () {\r",
+											"    pm.expect(pm.response.json().success).to.be.true;\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Config fetched successfully.\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/config",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"config"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "config",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/config",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"config"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "avatar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// ✅ Ensure response is in JSON format\r",
+											"pm.test(\"Response is in JSON format\", function () {\r",
+											"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Parse response JSON\r",
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// ✅ Validate response status code\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// ✅ Validate success flag\r",
+											"pm.test(\"Response contains success flag\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+											"});\r",
+											"\r",
+											"// ✅ Validate response message\r",
+											"pm.test(\"Response contains success message\", function () {\r",
+											"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Profile picture set successfully\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Validate avatar URL is returned\r",
+											"pm.test(\"Response contains an avatar URL\", function () {\r",
+											"    pm.expect(jsonData.data).to.have.property(\"profilePicture\").that.is.a(\"string\").and.includes(\"http\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Validate authorization requirement\r",
+											"pm.test(\"Request requires authorization\", function () {\r",
+											"    pm.response.to.not.have.status(401);\r",
+											"});\r",
+											"\r",
+											"// ✅ Store avatar URL in environment variable for future use\r",
+											"if (jsonData.data.avatar) {\r",
+											"    pm.environment.set(\"uploadedAvatarUrl\", jsonData.data.avatar);\r",
+											"    console.log(\"Avatar uploaded:\", jsonData.data.avatar);\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "avatar",
+											"type": "file",
+											"src": "postman-cloud:///1f00a020-2861-4780-8431-d61fc2551cd6"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/user/avatar",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"avatar"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Category",
+					"item": [
+						{
+							"name": "Create Category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// ✅ Test Case: Verify Status Code 201 (Created)\r",
+											"pm.test(\"Status code is 201 - Category Created\", function () {\r",
+											"    pm.response.to.have.status(200 || 201);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Response Contains Success Message\r",
+											"pm.test(\"Response includes success message\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Category created\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Validate Category ID Exists\r",
+											"pm.test(\"Response contains categoryId\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.data).to.have.property(\"id\").that.is.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Response Time Within Limits\r",
+											"pm.test(\"Response time is under 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Attempt to Create Duplicate Category (Should Fail)\r",
+											"pm.test(\"Duplicate category creation should fail\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    if (pm.response.code === 400) {\r",
+											"        pm.expect(jsonData).to.have.property(\"error\").that.includes(\"already exists\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"categoryId\", pm.response.json().data.id);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Ensure admin token exists\r",
+											"if (!pm.environment.get(\"admin_token\")) {\r",
+											"    console.warn(\"⚠️ Warning: Missing 'admin_token'. Ensure authentication is set.\");\r",
+											"}\r",
+											"\r",
+											"// Category Data Pool\r",
+											"const categories = [\r",
+											"    { name: \"Foregin Fragrance\", description: \"Luxurious perfumes, body mists, and essential oils to express your style.\" },\r",
+											"    { name: \"Local Fragrance\", description: \"Luxurious perfumes, body mists, and essential oils to express your style.\" },\r",
+											"    { name: \"Foreign Cosmetics\", description: \"Enhance beauty with premium skincare, makeup, and beauty essentials.\" },\r",
+											"    { name: \"Local Cosmetics\", description: \"Enhance beauty with premium skincare, makeup, and beauty essentials.\" },\r",
+											"    { name: \"Chic Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Stylist Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Men Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Women Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Children Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Teens Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Unisex Clothing\", description: \"Trendy outfits for every season, occasion, and lifestyle.\" },\r",
+											"    { name: \"Men Shoe Wears\", description: \"Step up your fashion with stylish and comfortable footwear.\" },\r",
+											"    { name: \"Electronics\", description: \"Latest gadgets, smart devices, and high-tech accessories.\" }\r",
+											"];\r",
+											"\r",
+											"// Randomly select a category\r",
+											"const randomCategory = categories[Math.floor(Math.random() * categories.length)];\r",
+											"\r",
+											"// Set request body dynamically\r",
+											"pm.environment.set(\"currentPayload\", JSON.stringify(randomCategory));\r",
+											"\r",
+											"// Log request payload for debugging\r",
+											"console.log(\"🟢 Auto-generated Category:\", randomCategory);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/category",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"category"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Categories",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// ✅ Test Case: Verify Status Code 200 (Success)\r",
+											"pm.test(\"Status code is 200 - Categories retrieved successfully\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Validate Success Field\r",
+											"pm.test(\"Response success field should be true\", function () {\r",
+											"    pm.expect(jsonData.success).to.eql(true);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Validate Message Field\r",
+											"pm.test(\"Response message should confirm category retrieval\", function () {\r",
+											"    pm.expect(jsonData.message).to.eql(\"Category fetched successfully\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Ensure Data is an Array\r",
+											"pm.test(\"Response contains a list of categories\", function () {\r",
+											"    pm.expect(jsonData.data).to.be.an(\"array\").that.is.not.empty;\r",
+											"});\r",
+											"\r",
+											"// ✅ Store a Random Category ID as Environment Variable\r",
+											"if (jsonData.data.length > 0) {\r",
+											"    let randomIndex = Math.floor(Math.random() * jsonData.data.length);\r",
+											"    let selectedCategory = jsonData.data[randomIndex]; \r",
+											"    pm.environment.set(\"categoryId\", selectedCategory.id);\r",
+											"    console.log(\"🟢 Randomly Stored Category ID:\", selectedCategory.id);\r",
+											"} else {\r",
+											"    console.warn(\"⚠️ No categories found in response.\");\r",
+											"}\r",
+											"\r",
+											"// ✅ Response Time Test\r",
+											"pm.test(\"Response time is under 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"categoryId4p\", pm.response.json().data[0].id) // Store the first category ID as an environment variable\r",
+											"\r",
+											"pm.environment.set(\"categoryId\", pm.response.json().data[3].id)"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Ensure admin token exists\r",
+											"if (!pm.environment.get(\"adminAuthToken\")) {\r",
+											"    console.warn(\"⚠️ Missing 'admin_token'. Ensure authentication is set.\");\r",
+											"}\r",
+											"\r",
+											"// Clear previous category ID (optional)\r",
+											"pm.environment.unset(\"categoryId\");\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/category",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"category"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// ✅ Test Case: Verify Status Code 201 (Created)\r",
+											"pm.test(\"Status code is 201 - Category Created\", function () {\r",
+											"    pm.response.to.have.status(200 || 201);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Response Contains Success Message\r",
+											"pm.test(\"Response includes success message\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Category updated successfully\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Validate Category ID Exists\r",
+											"pm.test(\"Response contains categoryId\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.data).to.have.property(\"id\").that.is.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Response Time Within Limits\r",
+											"pm.test(\"Response time is under 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Attempt to Create Duplicate Category (Should Fail)\r",
+											"pm.test(\"Duplicate category creation should fail\", function () {\r",
+											"    let jsonData = pm.response.json();\r",
+											"    if (pm.response.code === 400) {\r",
+											"        pm.expect(jsonData).to.have.property(\"error\").that.includes(\"already exists\");\r",
+											"    }\r",
+											"});\r",
+											"\r",
+											"pm.environment.set(\"categoryId\", pm.response.json().data.id);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"packages": {},
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{currentPayload}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/admin/category/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"category",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{categoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category by ID",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test for a successful response status\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// Test for response body properties\r",
+											"pm.test(\"Response body has 'success' property\", function () {\r",
+											"    pm.expect(pm.response.json()).to.have.property('success');\r",
+											"});\r",
+											"pm.test(\"Response body has 'message' property\", function () {\r",
+											"    pm.expect(pm.response.json()).to.have.property('message');\r",
+											"});\r",
+											"pm.test(\"Response body has 'data' property\", function () {\r",
+											"    pm.expect(pm.response.json()).to.have.property('data');\r",
+											"});\r",
+											"\r",
+											"// Test for specific data properties\r",
+											"pm.test(\"Data property has 'id' field\", function () {\r",
+											"    pm.expect(pm.response.json().data).to.have.property('id');\r",
+											"});\r",
+											"pm.test(\"Data property has 'name' field\", function () {\r",
+											"    pm.expect(pm.response.json().data).to.have.property('name');\r",
+											"});\r",
+											"pm.test(\"Data property has 'description' field\", function () {\r",
+											"    pm.expect(pm.response.json().data).to.have.property('description');\r",
+											"});\r",
+											"pm.test(\"Data property has 'createdAt' field\", function () {\r",
+											"    pm.expect(pm.response.json().data).to.have.property('createdAt');\r",
+											"});\r",
+											"pm.test(\"Data property has 'updatedAt' field\", function () {\r",
+											"    pm.expect(pm.response.json().data).to.have.property('updatedAt');\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/category/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"category",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{categoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Ensure admin token exists\r",
+											"if (!pm.environment.get(\"adminAuthtoken\")) {\r",
+											"    console.warn(\"⚠️ Missing 'admin_token'. Ensure authentication is set.\");\r",
+											"}\r",
+											"\r",
+											"// Retrieve the category ID from the environment\r",
+											"let categoryId = pm.environment.get(\"categoryId\");\r",
+											"\r",
+											"// Validate if category ID is set\r",
+											"if (!categoryId) {\r",
+											"    console.warn(\"⚠️ Warning: 'categoryId' is missing from environment variables.\");\r",
+											"}\r",
+											"\r",
+											"// Log the category ID for debugging\r",
+											"console.log(\"🟢 Using Category ID:\", categoryId);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let jsonData = pm.response.json();\r",
+											"\r",
+											"// ✅ Test Case: Verify Status Code 200 (Success)\r",
+											"pm.test(\"Status code is 200 - Category Retrieved\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Validate Response Structure\r",
+											"pm.test(\"Response contains category details\", function () {\r",
+											"    pm.expect(jsonData.data).to.have.property(\"name\").that.is.a(\"string\");\r",
+											"    pm.expect(jsonData.data).to.have.property(\"description\").that.is.a(\"string\");\r",
+											"});\r",
+											"\r",
+											"// ✅ Test Case: Response Time\r",
+											"pm.test(\"Response time is under 1000ms\", function () {\r",
+											"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+											"});\r",
+											"\r",
+											"// ❌ Test Case: Missing Auth Token\r",
+											"if (!pm.environment.get(\"adminAuthToken\")) {\r",
+											"    pm.test(\"Response should be 401 Unauthorized when no token is provided\", function () {\r",
+											"        pm.response.to.have.status(401);\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// ❌ Test Case: Invalid Category ID (404)\r",
+											"if (pm.environment.get(\"categoryId\") === \"invalid-id\") {\r",
+											"    pm.test(\"Response should be 404 Not Found for invalid category ID\", function () {\r",
+											"        pm.response.to.have.status(404);\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"// ❌ Test Case: Missing Category ID (400)\r",
+											"if (!pm.environment.get(\"categoryId\")) {\r",
+											"    pm.test(\"Response should be 400 Bad Request for missing category ID\", function () {\r",
+											"        pm.response.to.have.status(400);\r",
+											"    });\r",
+											"}\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminAuthToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/admin/category/:id",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"admin",
+										"category",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "{{categoryId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "valid Sign In",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const testCases = {\r",
+									"    \"valid_login\": {\r",
+									"     \"email\": \"testog@e-record.com\",\r",
+									"    \"password\": \"Pass@12345\"\r",
+									"},\r",
+									"    \"missing_email\": { \r",
+									"        \"email\": \"\", \r",
+									"        \"password\": \"Pass$50000\" \r",
+									"    },\r",
+									"    \"missing_password\": { \r",
+									"        \"email\": \"existing@mail.com\", \r",
+									"        \"password\": \"\" \r",
+									"    },\r",
+									"    \"invalid_email_format\": { \r",
+									"        \"email\": \"invalid-email\", \r",
+									"        \"password\": \"Pass$50000\" \r",
+									"    },\r",
+									"    \"incorrect_password\": { \r",
+									"        \"email\": \"existing@mail.com\", \r",
+									"        \"password\": \"WrongPass123\" \r",
+									"    },\r",
+									"    \"unregistered_email\": { \r",
+									"        \"email\": \"unregistered@mail.com\", \r",
+									"        \"password\": \"Pass$50000\" \r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"// Get the current test case (default: valid_login)\r",
+									"let testCase = pm.environment.get(\"testCase\") || \"valid_login\";\r",
+									"pm.environment.set(\"currentPayload\", JSON.stringify(testCases[testCase]));\r",
+									"\r",
+									"// Set request headers for tracking\r",
+									"pm.request.headers.add({ key: \"Test-Case\", value: testCase });\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"let testCase = pm.request.headers.get(\"Test-Case\");\r",
+									"\r",
+									"const expectedStatus = {\r",
+									"    \"valid_login\": 200,\r",
+									"    \"missing_email\": 400,\r",
+									"    \"missing_password\": 400,\r",
+									"    \"invalid_email_format\": 400,\r",
+									"    \"incorrect_password\": 401,\r",
+									"    \"unregistered_email\": 404\r",
+									"};\r",
+									"\r",
+									"// ✅ Test Case 1: Validate Status Code\r",
+									"pm.test(`[${testCase}] Status should be ${expectedStatus[testCase]}`, function () {\r",
+									"    pm.response.to.have.status(expectedStatus[testCase]);\r",
+									"});\r",
+									"\r",
+									"// Handle successful login response\r",
+									"if (pm.response.code === 200) {\r",
+									"    // ✅ Test Case 2: Verify Success Field Value\r",
+									"    pm.test(\"Verify that the success field is true\", function () {\r",
+									"        pm.expect(response.success).to.eql(true);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 3: Check Message Field Value\r",
+									"    pm.test(\"Check that the message field is 'User sign in successful'\", function () {\r",
+									"        pm.expect(response.message).to.eql(\"User sign in successful\");\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 4: Validate Token Field\r",
+									"    pm.test(\"Validate that the token field is present and not empty\", function () {\r",
+									"        pm.expect(response.data.token).to.be.a('string');\r",
+									"        pm.expect(response.data.token.length).to.be.greaterThan(0);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 5: Verify Expiration Timestamp Format\r",
+									"    pm.test(\"Verify that the expiration timestamp is in ISO 8601 format\", function () {\r",
+									"        let expiresIn = response.data.expiresIn;\r",
+									"        pm.expect(new Date(expiresIn).toISOString()).to.eql(expiresIn);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 6: Validate User Data Fields\r",
+									"    pm.test(\"Validate that the user data fields are correct\", function () {\r",
+									"        let user = response.data.user;\r",
+									"        \r",
+									"        pm.expect(user.id).to.not.eql(null);\r",
+									"        pm.expect(user.email).to.not.eql(null);\r",
+									"        pm.expect(user.fullName).to.not.eql(null);\r",
+									"        pm.expect(user.firstName).to.not.eql(null);\r",
+									"        pm.expect(user.lastName).to.not.eql(null);\r",
+									"    });\r",
+									"\r",
+									"    pm.environment.set(\"userId\", response.data.user.id)\r",
+									"\r",
+									"    // ✅ Test Case 7: Verify KYC Status\r",
+									"    pm.test(\"Verify that the KYC status is false\", function () {\r",
+									"        pm.expect(response.data.user.kycCompleted).to.eql(false);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 9: Check Token Format (JWT)\r",
+									"    pm.test(\"Check that the token is in a valid JWT format\", function () {\r",
+									"        let token = response.data.token;\r",
+									"        let tokenParts = token.split('.');\r",
+									"\r",
+									"        pm.expect(tokenParts).to.have.lengthOf(3);\r",
+									"        pm.expect(tokenParts[0]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+									"        pm.expect(tokenParts[1]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+									"        pm.expect(tokenParts[2]).to.match(/^[A-Za-z0-9_-]+$/);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Test Case 10: Validate Response Time\r",
+									"    pm.test(\"Validate that the response time is less than 500ms\", function () {\r",
+									"        pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+									"    });\r",
+									"\r",
+									"    // ✅ Store Auth Token for Future Requests\r",
+									"    pm.environment.set(\"authToken\", response.data.token);\r",
+									"} \r",
+									"// Handle error cases\r",
+									"else {\r",
+									"    pm.test(\"Response contains error message\", function () {\r",
+									"        pm.expect(response).to.have.property(\"error\");\r",
+									"        pm.expect(response.error).to.be.a(\"string\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{currentPayload}}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signin/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// ✅ Ensure Authorization Token is Set",
+									"if (!pm.environment.get(\"authToken\")) {",
+									"    throw new Error(\"Authorization token is missing! Please log in and set the 'authToken' in environment variables.\");",
+									"}",
+									"",
+									"// ✅ Set Authorization Header",
+									"pm.request.headers.add({",
+									"    key: \"Authorization\",",
+									"    value: `Bearer ${pm.environment.get(\"authToken\")}`",
+									"});",
+									"",
+									"// ✅ Function to generate a random number within a range",
+									"function getRandomNumber(min, max) {",
+									"    return Math.floor(Math.random() * (max - min + 1)) + min;",
+									"}",
+									"",
+									"// ✅ Function to generate a random date within a range",
+									"function getRandomDate(start, end) {",
+									"    return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))",
+									"        .toISOString()",
+									"        .split(\"T\")[0]; // Returns in YYYY-MM-DD format",
+									"}",
+									"",
+									"// ✅ Predefined list of real product names and descriptions",
+									"const products = [",
+									"    { title: \"Nestlé Pure Life Water\", description: \"Premium purified bottled water for daily hydration.\" },",
+									"    { title: \"Nike Air Max 270\", description: \"Lightweight sneakers with superior cushioning and style.\" },",
+									"    { title: \"Samsung Galaxy S23\", description: \"Flagship smartphone with high-end camera and performance.\" },",
+									"    { title: \"Apple MacBook Pro 14-inch\", description: \"Powerful laptop for professionals with M2 chip.\" },",
+									"    { title: \"Oreo Double Stuf Cookies\", description: \"Classic chocolate sandwich cookies with extra filling.\" },",
+									"    { title: \"Colgate Total Toothpaste\", description: \"Antibacterial fluoride toothpaste for strong teeth.\" },",
+									"    { title: \"Coca-Cola Zero Sugar\", description: \"Refreshing soft drink with zero sugar and great taste.\" },",
+									"    { title: \"L'Oréal Revitalift Cream\", description: \"Anti-aging face cream with hyaluronic acid.\" },",
+									"    { title: \"Samsung 55-inch Smart TV\", description: \"4K UHD LED Smart TV with AI-powered image processing.\" },",
+									"    { title: \"LG Side-by-Side Refrigerator\", description: \"Spacious fridge with inverter technology for energy saving.\" }",
+									"];",
+									"",
+									"// ✅ Predefined list of real brand names",
+									"const brands = [",
+									"    \"Nike\", \"Adidas\", \"Apple\", \"Samsung\", \"Nestlé\", \"L'Oréal\", \"LG\", \"Sony\", \"Coca-Cola\", \"Colgate\"",
+									"];",
+									"",
+									"// ✅ Select a random product and brand",
+									"const selectedProduct = products[Math.floor(Math.random() * products.length)];",
+									"const selectedBrand = brands[Math.floor(Math.random() * brands.length)];",
+									"",
+									"// ✅ Generate dynamic product details",
+									"const productDetails = {",
+									"    title: selectedProduct.title,",
+									"    description: selectedProduct.description,",
+									"    brandName: selectedBrand,",
+									"    model: `M${getRandomNumber(1000, 9999)}`,",
+									"    expiryDate: getRandomDate(new Date(2025, 0, 1), new Date(2030, 11, 31)), // Future date",
+									"    manufactureDate: getRandomDate(new Date(2023, 0, 1), new Date(2024, 11, 31)), // Past date",
+									"    isoNumber: getRandomNumber(1000, 9999).toString(),",
+									"    nafdacNumber: getRandomNumber(1000, 9999).toString(),",
+									"    quantity: getRandomNumber(1, 100),",
+									"    costPrice: getRandomNumber(50, 500),",
+									"    sellingPrice: getRandomNumber(100, 1000),",
+									"    eanNumber: getRandomNumber(1000, 9999).toString(),",
+									"    categoryId: pm.environment.get(\"categoryId4p\"),",
+									"    saleStart: getRandomDate(new Date(2024, 0, 1), new Date(2025, 11, 31)), // Future date",
+									"    saleEnd: getRandomDate(new Date(2025, 0, 1), new Date(2026, 11, 31)), // Future date",
+									"    imagePath: \"/Users/apple/Downloads/image_1740593422807.jpg\" // Replace with dynamic upload if needed",
+									"};",
+									"",
+									"// ✅ Update form-data in the request body",
+									"pm.request.body.update({",
+									"    mode: \"formdata\",",
+									"    formdata: [",
+									"        { key: \"title\", value: productDetails.title, type: \"text\" },",
+									"        { key: \"description\", value: productDetails.description, type: \"text\" },",
+									"        { key: \"brandName\", value: productDetails.brandName, type: \"text\" },",
+									"        { key: \"model\", value: productDetails.model, type: \"text\" },",
+									"        { key: \"expiryDate\", value: productDetails.expiryDate, type: \"text\" },",
+									"        { key: \"manufactureDate\", value: productDetails.manufactureDate, type: \"text\" },",
+									"        { key: \"isoNumber\", value: productDetails.isoNumber, type: \"text\" },",
+									"        { key: \"nafdacNumber\", value: productDetails.nafdacNumber, type: \"text\" },",
+									"        { key: \"quantity\", value: productDetails.quantity.toString(), type: \"text\" },",
+									"        { key: \"costPrice\", value: productDetails.costPrice.toString(), type: \"text\" },",
+									"        { key: \"sellingPrice\", value: productDetails.sellingPrice.toString(), type: \"text\" },",
+									"        { key: \"eanNumber\", value: productDetails.eanNumber, type: \"text\" },",
+									"        { key: \"categoryId\", value: productDetails.categoryId, type: \"text\" },",
+									"        { key: \"saleStart\", value: productDetails.saleStart, type: \"text\" },",
+									"        { key: \"saleEnd\", value: productDetails.saleEnd, type: \"text\" },",
+									"        { key: \"images\", src: productDetails.imagePath, type: \"file\" }",
+									"    ]",
+									"});",
+									"",
+									"// ✅ Log generated data for debugging",
+									"console.log(\"🔹 Generated product details:\", productDetails);",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response exists\r",
+									"pm.test(\"Response should be present\", function () {\r",
+									"    pm.response.to.have.status(200); // Corrected the expected status code\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse the response body\r",
+									"let response = pm.response.json();\r",
+									"\r",
+									"// ✅ Define required fields\r",
+									"const requiredFields = [\r",
+									"    \"id\", \"title\", \"description\", \"brandName\", \"model\",\r",
+									"    \"expiryDate\", \"manufactureDate\", \"isoNumber\", \"nafdacNumber\",\r",
+									"    \"quantity\", \"costPrice\", \"sellingPrice\", \"eanNumber\", \"categoryId\",\r",
+									"    \"saleStart\", \"saleEnd\"\r",
+									"];\r",
+									"\r",
+									"// ✅ Check that required fields exist and are not empty\r",
+									"pm.test(\"Required fields should not be empty\", function () {\r",
+									"    requiredFields.forEach(field => {\r",
+									"        pm.expect(response.data).to.have.property(field);\r",
+									"        if (response[field]) {\r",
+									"            pm.expect(response.data[field]).to.not.be.null;\r",
+									"            pm.expect(response.data[field]).to.not.be.undefined;\r",
+									"\r",
+									"            // ✅ Check if string fields are not empty\r",
+									"            if (typeof response.data[field] === \"string\") {\r",
+									"                pm.expect(response.data[field].trim()).to.not.equal(\"\");\r",
+									"            }\r",
+									"\r",
+									"            // ✅ Check if array fields are not empty\r",
+									"            if (Array.isArray(response.data[field])) {\r",
+									"                pm.expect(response.data[field].length).to.be.greaterThan(0);\r",
+									"            }\r",
+									"\r",
+									"            // ✅ Check if numeric fields are valid\r",
+									"            if ([\"quantity\", \"costPrice\", \"sellingPrice\"].includes(field)) {\r",
+									"                pm.expect(response.data[field]).to.be.a(\"number\");\r",
+									"                pm.expect(response.data[field]).to.be.greaterThan(0);\r",
+									"            }\r",
+									"        }\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate the response contains a success message\r",
+									"pm.test(\"Response should contain a success message\", function () {\r",
+									"    pm.expect(response).to.have.property(\"message\").that.is.a(\"string\");\r",
+									"    pm.expect(response.message.toLowerCase()).to.include(\"success\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate that selling price is not lower than cost price\r",
+									"pm.test(\"Selling price should be greater than or equal to cost price\", function () {\r",
+									"    if (response.sellingPrice && response.costPrice) {\r",
+									"        pm.expect(response.sellingPrice).to.be.at.least(response.costPrice);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate dates are in YYYY-MM-DD format\r",
+									"pm.test(\"Dates should be in valid format\", function () {\r",
+									"    [\"expiryDate\", \"manufactureDate\", \"saleStart\", \"saleEnd\"].forEach(field => {\r",
+									"        if (response[field]) {\r",
+									"            pm.expect(response[field]).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"        }\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"// ✅ Log response for debugging\r",
+									"console.log(\"🔹 Response Body:\", response);\r",
+									"\r",
+									"pm.environment.set(\"productId\", response?.data?.id); // Fixed the TypeError by using optional chaining\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get products",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate response message\r",
+									"pm.test(\"Response contains success message\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Product fetched successfully\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate data structure\r",
+									"pm.test(\"Response contains an array of products\", function () {\r",
+									"    pm.expect(jsonData.data).to.have.property(\"result\").that.is.an(\"array\");\r",
+									"\r",
+									"    let products = jsonData.data.result;\r",
+									"    \r",
+									"    if (products.length > 0) {\r",
+									"        let product = products[0];\r",
+									"        pm.expect(product).to.have.property(\"id\").that.is.a(\"string\");\r",
+									"        pm.expect(product).to.have.property(\"title\").that.is.a(\"string\");\r",
+									"        pm.expect(product).to.have.property(\"sellingPrice\").that.is.a(\"string\"); // Adjusted type based on response\r",
+									"        pm.expect(product).to.have.property(\"description\").that.is.a(\"string\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									"\r",
+									"// ✅ Extract and store all unique product IDs\r",
+									"let products = jsonData.data?.result || [];\r",
+									"let existingIds = pm.environment.get(\"product_ids\");\r",
+									"existingIds = existingIds ? JSON.parse(existingIds) : [];\r",
+									"\r",
+									"let newProductIds = products.map(product => product.id);\r",
+									"\r",
+									"// ✅ Merge new IDs with existing ones and remove duplicates\r",
+									"let uniqueProductIds = [...new Set([...existingIds, ...newProductIds])];\r",
+									"\r",
+									"// ✅ Store updated product IDs in environment variable\r",
+									"pm.environment.set(\"product_ids\", JSON.stringify(uniqueProductIds));\r",
+									"\r",
+									"// ✅ Store first product ID separately for quick access\r",
+									"if (products.length > 0) {\r",
+									"    pm.environment.set(\"firstProductId\", products[0].id);\r",
+									"    console.log(\"First product ID stored:\", products[0].id);\r",
+									"}\r",
+									"\r",
+									"// ✅ Log the unique extracted product IDs for debugging\r",
+									"console.log(\"Extracted Product IDs:\", uniqueProductIds);\r",
+									"\r",
+									"// ✅ Test that product IDs are correctly stored\r",
+									"pm.test(\"Product IDs should be extracted, stored, and unique\", function () {\r",
+									"    pm.expect(uniqueProductIds).to.be.an(\"array\").that.is.not.empty;\r",
+									"    uniqueProductIds.forEach(id => pm.expect(id).to.be.a(\"string\").that.has.lengthOf(36)); // UUID validation\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get product by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "18d8fbd5-2df5-4e66-a812-10e70dff19ec"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", /application\\/json/);\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate status code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate response message\r",
+									"pm.test(\"Response contains success message\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Product updated successfully\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate updated product structure\r",
+									"pm.test(\"Response contains updated product details\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"data\");\r",
+									"    let product = jsonData.data;\r",
+									"    pm.expect(product).to.have.property(\"id\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"name\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"price\").that.is.a(\"number\");\r",
+									"    pm.expect(product).to.have.property(\"description\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"imageUrl\").that.is.a(\"string\").and.includes(\"http\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "milkose",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": "postman-cloud:///1f00a020-2861-4780-8431-d61fc2551cd6"
+								},
+								{
+									"key": "detail",
+									"value": "okay",
+									"type": "text"
+								},
+								{
+									"key": "brandName",
+									"value": "hollandia",
+									"type": "text"
+								},
+								{
+									"key": "model",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "great stuff",
+									"type": "text"
+								},
+								{
+									"key": "isoNumber",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "nafdacNumber",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "costPrice",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "sellingPrice",
+									"value": "120",
+									"type": "text"
+								},
+								{
+									"key": "eanNumber",
+									"value": "1234",
+									"type": "text"
+								},
+								{
+									"key": "manufactureDate",
+									"value": "2024-12-31T00:00:00.000Z",
+									"type": "text"
+								},
+								{
+									"key": "expiryDate",
+									"value": "2024-12-31T00:00:00.000Z",
+									"type": "text"
+								},
+								{
+									"key": "saleStart",
+									"value": "2024-12-01T00:00:00.000Z",
+									"type": "text"
+								},
+								{
+									"key": "saleEnd",
+									"value": "2024-12-31T00:00:00.000Z",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/products/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{randomProductId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate product data structure\r",
+									"pm.test(\"Response contains valid product details\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"data\");\r",
+									"    let product = jsonData.data;\r",
+									"    \r",
+									"    pm.expect(product).to.have.property(\"id\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"title\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"sellingPrice\").that.is.a(\"string\");\r",
+									"    pm.expect(product).to.have.property(\"description\").that.is.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Ensure the product ID in the response matches the selected ID\r",
+									"let selectedProductId = pm.environment.get(\"randomProductId\");\r",
+									"if (selectedProductId) {\r",
+									"    pm.test(\"Response product ID matches the selected ID\", function () {\r",
+									"        pm.expect(jsonData.data.id).to.equal(selectedProductId);\r",
+									"    });\r",
+									"} else {\r",
+									"    console.warn(\"No product ID was selected before request execution.\");\r",
+									"}\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// ✅ Retrieve stored product IDs from the environment\r",
+									"let storedProductIds = pm.environment.get(\"product_ids\");\r",
+									"storedProductIds = storedProductIds ? JSON.parse(storedProductIds) : [];\r",
+									"\r",
+									"// ✅ Select a random product ID and store it before the request runs\r",
+									"if (storedProductIds.length > 0) {\r",
+									"    let randomIndex = Math.floor(Math.random() * storedProductIds.length);\r",
+									"    let randomProductId = storedProductIds[randomIndex];\r",
+									"\r",
+									"    // ✅ Store the selected product ID for use in the request\r",
+									"    pm.environment.set(\"randomProductId\", randomProductId);\r",
+									"    console.log(\"Randomly selected Product ID:\", randomProductId);\r",
+									"} else {\r",
+									"    console.warn(\"No stored product IDs available! Ensure the previous request fetched product IDs correctly.\");\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{randomProductId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top brands",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate response message\r",
+									"pm.test(\"Response contains success message\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Product top brand fetched successfully\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate data structure (Array of Brands)\r",
+									"pm.test(\"Response contains an array of top brands\", function () {\r",
+									"    pm.expect(jsonData.data).to.be.an(\"array\");\r",
+									"\r",
+									"    if (jsonData.data.length > 0) {\r",
+									"        let brand = jsonData.data[0];\r",
+									"\r",
+									"        pm.expect(brand).to.have.property(\"brandName\").that.is.a(\"string\");\r",
+									"        pm.expect(brand).to.have.property(\"count\").that.is.a(\"number\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									"\r",
+									"// ✅ Store brand names for future use\r",
+									"if (jsonData.data.length > 0) {\r",
+									"    let brandNames = jsonData.data.map(brand => brand.brandName);\r",
+									"    pm.environment.set(\"brand_names\", JSON.stringify(brandNames));\r",
+									"    console.log(\"Stored brand names:\", brandNames);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/brands",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"brands"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search products",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"q\": \"apple\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "seller",
+			"item": [
+				{
+					"name": "create seller",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Function to generate a random Nigerian phone number\r",
+									"function generatePhoneNumber() {\r",
+									"    return \"081\" + Math.floor(10000000 + Math.random() * 90000000); // Generates 081xxxxxxx\r",
+									"}\r",
+									"\r",
+									"// Function to generate a random 11-digit NIN number\r",
+									"function generateNIN() {\r",
+									"    return Math.floor(10000000000 + Math.random() * 90000000000).toString();\r",
+									"}\r",
+									"\r",
+									"// Function to generate a random shop name\r",
+									"function generateShopName() {\r",
+									"    const shopPrefixes = [\"Super\", \"Mega\", \"Classic\", \"Elite\", \"Premium\", \"Budget\"];\r",
+									"    const shopSuffixes = [\"Mart\", \"Shop\", \"Store\", \"Bazaar\", \"Hub\", \"Outlet\"];\r",
+									"    return (\r",
+									"        shopPrefixes[Math.floor(Math.random() * shopPrefixes.length)] +\r",
+									"        \" \" +\r",
+									"        shopSuffixes[Math.floor(Math.random() * shopSuffixes.length)]\r",
+									"    );\r",
+									"}\r",
+									"\r",
+									"// Function to generate a random Nigerian bank code\r",
+									"function getRandomBank() {\r",
+									"    const banks = [\r",
+									"        { name: \"FirstBank\", code: \"50211\" },\r",
+									"        { name: \"Access Bank\", code: \"044\" },\r",
+									"        { name: \"Zenith Bank\", code: \"057\" },\r",
+									"        { name: \"GTBank\", code: \"058\" },\r",
+									"        { name: \"UBA\", code: \"033\" }\r",
+									"    ];\r",
+									"    return banks[Math.floor(Math.random() * banks.length)];\r",
+									"}\r",
+									"\r",
+									"// Generate random seller details\r",
+									"let firstName = [\"John\", \"James\", \"Sarah\", \"Jane\", \"Michael\", \"Fidelis\"][Math.floor(Math.random() * 6)];\r",
+									"let lastName = [\"Doe\", \"Smith\", \"Johnson\", \"Brown\", \"Ogbeni\", \"Adams\"][Math.floor(Math.random() * 6)];\r",
+									"let managerFullName = firstName + \" \" + lastName;\r",
+									"let shopName = generateShopName();\r",
+									"let cacNumber = Math.floor(1000 + Math.random() * 9000).toString(); // 4-digit CAC Number\r",
+									"let documentType = \"NIN\";\r",
+									"let documentNumber = generateNIN();\r",
+									"let phoneNumber = generatePhoneNumber();\r",
+									"let accountType = \"INDIVIDUAL\";\r",
+									"let bankDetails = getRandomBank();\r",
+									"let accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();\r",
+									"let documentImage = \"IMG-20241225-WA0013.jpg\"; // Simulated file name\r",
+									"\r",
+									"// Store variables in Postman environment\r",
+									"pm.environment.set(\"managerFullName\", managerFullName);\r",
+									"pm.environment.set(\"firstName\", firstName);\r",
+									"pm.environment.set(\"lastName\", lastName);\r",
+									"pm.environment.set(\"shopName\", shopName);\r",
+									"pm.environment.set(\"cacNumber\", cacNumber);\r",
+									"pm.environment.set(\"documentType\", documentType);\r",
+									"pm.environment.set(\"documentNumber\", documentNumber);\r",
+									"pm.environment.set(\"phoneNumber\", phoneNumber);\r",
+									"pm.environment.set(\"accountType\", accountType);\r",
+									"pm.environment.set(\"bankCode\", bankDetails.code);\r",
+									"pm.environment.set(\"bankName\", bankDetails.name);\r",
+									"pm.environment.set(\"accountNumber\", accountNumber);\r",
+									"pm.environment.set(\"documentImage\", documentImage);\r",
+									"\r",
+									"// Log generated values for debugging\r",
+									"console.log(\"✅ Auto-Generated Seller Details:\");\r",
+									"console.log({\r",
+									"    managerFullName,\r",
+									"    firstName,\r",
+									"    lastName,\r",
+									"    shopName,\r",
+									"    cacNumber,\r",
+									"    documentType,\r",
+									"    documentNumber,\r",
+									"    phoneNumber,\r",
+									"    accountType,\r",
+									"    bankCode: bankDetails.code,\r",
+									"    bankName: bankDetails.name,\r",
+									"    accountNumber,\r",
+									"    documentImage\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code\r",
+									"pm.test(\"Status code is 201 (Created)\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success message\r",
+									"pm.test(\"Response message is correct\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"message\", \"Seller created successfully\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate response data structure\r",
+									"pm.test(\"Response contains seller details\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"data\").that.is.an(\"object\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"sellerId\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"managerFullName\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"shopName\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"phoneNumber\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"bankName\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonData.data).to.have.property(\"accountNumber\").that.is.a(\"string\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Store seller ID for future requests\r",
+									"// pm.environment.set(\"sellerId\", jsonData.data.sellerId);\r",
+									"// console.log(\"Seller ID stored:\", jsonData.data.sellerId);\r",
+									"\r",
+									"// ✅ Validate error response for invalid input\r",
+									"pm.test(\"Error response for invalid input\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", false);\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Invalid input\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate error response for missing required fields\r",
+									"pm.test(\"Error response for missing fields\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", false);\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"Required fields are missing\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "managerFullName",
+									"value": "{{managerFullName}}",
+									"type": "text"
+								},
+								{
+									"key": "shopName",
+									"value": "{{shopName}}",
+									"type": "text"
+								},
+								{
+									"key": "cacNumber",
+									"value": "{{cacNumber}}",
+									"type": "text"
+								},
+								{
+									"key": "documentType",
+									"value": "NIN",
+									"type": "text"
+								},
+								{
+									"key": "documentNumber",
+									"value": "77280892822",
+									"type": "text"
+								},
+								{
+									"key": "phoneNumber",
+									"value": "08109642088",
+									"type": "text"
+								},
+								{
+									"key": "idNumber",
+									"value": "56254709617",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "firstName",
+									"value": "Fidelis",
+									"type": "text"
+								},
+								{
+									"key": "lastName",
+									"value": "Ogbeni",
+									"type": "text"
+								},
+								{
+									"key": "accountType",
+									"value": "INDIVIDUAL",
+									"type": "text"
+								},
+								{
+									"key": "bankCode",
+									"value": "50211",
+									"type": "text"
+								},
+								{
+									"key": "bankName",
+									"value": "FirstBank",
+									"type": "text"
+								},
+								{
+									"key": "accountNumber",
+									"value": "3066415171",
+									"type": "text"
+								},
+								{
+									"key": "documentImage",
+									"type": "file",
+									"src": "postman-cloud:///1f00a020-2861-4780-8431-d61fc2551cd6"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/seller",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"seller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get seller",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate success flag\r",
+									"pm.test(\"Response contains success flag\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"success\", true);\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate response message\r",
+									"pm.test(\"Response contains success message\", function () {\r",
+									"    pm.expect(jsonData).to.have.property(\"message\").that.includes(\"successfully\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate data structure\r",
+									"pm.test(\"Response contains valid seller details or No Seller added\", function () {\r",
+									"    pm.expect(jsonData.data).to.have.property(\"data\").that.is.an(\"object\");\r",
+									"\r",
+									"    let seller = jsonData.data;\r",
+									"    \r",
+									"    if(jsonData.data == null){\r",
+									"        pm.expect(jsonData.message).to.include(\"No Seller added\");\r",
+									"\r",
+									"    } else{\r",
+									"    pm.expect(seller).to.have.property(\"id\").that.is.a(\"string\");\r",
+									"    pm.expect(seller).to.have.property(\"name\").that.is.a(\"string\");\r",
+									"    pm.expect(seller).to.have.property(\"email\").that.is.a(\"string\").and.includes(\"@\");\r",
+									"    pm.expect(seller).to.have.property(\"phone\").that.is.a(\"string\");\r",
+									"    pm.expect(seller).to.have.property(\"storeName\").that.is.a(\"string\");\r",
+									"    pm.expect(seller).to.have.property(\"createdAt\").that.is.a(\"string\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									"\r",
+									"// ✅ Store Seller ID for future use\r",
+									"if (jsonData.data && jsonData.data.id) {\r",
+									"    pm.environment.set(\"seller_id\", jsonData.data.id);\r",
+									"    console.log(\"Stored Seller ID:\", jsonData.data.id);\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/seller",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"seller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete seller",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/seller",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"seller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get seller preference",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{lbase_url}}/seller/preferences",
+							"host": [
+								"{{lbase_url}}"
+							],
+							"path": [
+								"seller",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "seller products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/seller-products?categoryId={{categoryId}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"seller-products"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "{{categoryId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete seller preference",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// ✅ Ensure response is in JSON format\r",
+									"pm.test(\"Response is in JSON format\", function () {\r",
+									"    pm.response.to.have.header(\"Content-Type\", \"application/json; charset=utf-8\");\r",
+									"});\r",
+									"\r",
+									"// ✅ Parse response JSON\r",
+									"let jsonData = pm.response.json();\r",
+									"\r",
+									"// ✅ Validate response status code (200 for success, 404 if no preferences exist)\r",
+									"pm.test(\"Status code is 200 or 404\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 404]);\r",
+									"});\r",
+									"\r",
+									"// ✅ Check if seller preferences were deleted\r",
+									"pm.test(\"Validate seller preferences deletion response\", function () {\r",
+									"    if (jsonData.success === false) {\r",
+									"        pm.expect(jsonData).to.have.property(\"message\", \"No seller preferences found to delete.\");\r",
+									"        console.log(\"❌ No seller preferences found.\");\r",
+									"    } else {\r",
+									"        pm.expect(jsonData).to.have.property(\"message\", \"Seller preferences deleted successfully.\");\r",
+									"        console.log(\"✅ Seller preferences deleted successfully.\");\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"// ✅ Validate authorization requirement\r",
+									"pm.test(\"Request requires authorization\", function () {\r",
+									"    pm.response.to.not.have.status(401);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminAuthToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/seller/preferences",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"seller",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://be-dev.dandysapp.com"
+		},
+		{
+			"key": "live_url",
+			"value": "\nhttps://be-api.dandysapp.com",
+			"disabled": true
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

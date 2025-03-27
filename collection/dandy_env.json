@@ -1,0 +1,267 @@
+{
+	"id": "754d8842-57fc-4d63-a84b-e8f2b7e7c69e",
+	"name": "dandy_env",
+	"values": [
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "currentPayload",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "reg.email",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "otpCode",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "valid.otpCode",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "reg.pass",
+			"value": "Pass$12345",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "new.pass",
+			"value": "Pass$00001",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "newPassword",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "newPass",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "mailtm_id",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "email",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "test.email",
+			"value": "testog@e-record.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "email_password",
+			"value": "testog",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "mailTmToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "retrievedOTP",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "bankCode",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "bankName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "accountNumber",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "accountName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "adminAuthToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "admin.email",
+			"value": "testog@e-record.com",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "admin.password",
+			"value": "Pass$12345",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ADMcurrentPayload",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "UserId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "productId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "product_ids",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "firstProductId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "randomProductId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "brand_names",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "managerFullName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "firstName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "lastName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "shopName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "cacNumber",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "documentType",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "documentNumber",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "phoneNumber",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "accountType",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "documentImage",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "categoryIds",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "categoryId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "categoryId4p",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-03-27T08:00:21.926Z",
+	"_postman_exported_using": "Postman/11.38.3"
+}
