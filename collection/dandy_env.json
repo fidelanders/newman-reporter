@@ -1,5 +1,5 @@
 {
-	"id": "754d8842-57fc-4d63-a84b-e8f2b7e7c69e",
+	"id": "4cb9f60a-2508-446b-9ce9-aff325363d09",
 	"name": "dandy_env",
 	"values": [
 		{
@@ -259,9 +259,105 @@
 			"value": "",
 			"type": "any",
 			"enabled": true
+		},
+		{
+			"key": "changePassword",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "productTitle",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "productDescription",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "brandName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "model",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "expiryDate",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "manufactureDate",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "quantity",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "sellingPrice",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "costPrice",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "sku",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "eanNumber",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "categoryName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "sellerEmail",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "sellerFullName",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "productFormData",
+			"value": "",
+			"type": "any",
+			"enabled": true
 		}
 	],
 	"_postman_variable_scope": "environment",
-	"_postman_exported_at": "2025-03-27T08:00:21.926Z",
-	"_postman_exported_using": "Postman/11.38.3"
+	"_postman_exported_at": "2025-03-28T06:59:53.486Z",
+	"_postman_exported_using": "Postman/11.38.4"
 }

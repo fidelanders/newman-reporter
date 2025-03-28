@@ -7,7 +7,7 @@ newman.run({
     reporters: ['htmlextra'], // Using htmlextra for better reporting
     reporter: {
         htmlextra: {
-            export: './reports/dandy_report.html', // Save report to a file
+            export: 'index.html', // Save report to a file
             logs: true, // Enable detailed logs
             showOnlyFails: false, // Show all results, not just failures
             noSyntaxHighlighting: false, // Keep syntax highlighting enabled

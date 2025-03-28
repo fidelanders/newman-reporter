@@ -3322,7 +3322,7 @@
 									"    categoryId: pm.environment.get(\"categoryId4p\"),",
 									"    saleStart: getRandomDate(new Date(2024, 0, 1), new Date(2025, 11, 31)), // Future date",
 									"    saleEnd: getRandomDate(new Date(2025, 0, 1), new Date(2026, 11, 31)), // Future date",
-									"    imagePath: \"https://drive.google.com/file/d/1RqUOUMGB8zMUvsTGh-ftPS_2_oLLrzbl/view?usp=drive_link\" // Replace with dynamic upload if needed",
+									"    imagePath: \"https://imagekit.io/tools/free-image-hosting/\" // Replace with dynamic upload if needed",
 									"};",
 									"",
 									"// ✅ Update form-data in the request body",
@@ -4175,7 +4175,7 @@
 									"// let accountType = \"INDIVIDUAL\";\r",
 									"// let bankDetails = getRandomBank();\r",
 									"// let accountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();\r",
-									"// // let documentImage = \"IMG-20241225-WA0013.jpg\"; // Simulated file name\r",
+									"// let documentImage = \"https://i.imgur.com/10V6mFc.jpeg\"; // Simulated file name\r",
 									"\r",
 									"// // Store variables in Postman environment\r",
 									"// pm.environment.set(\"managerFullName\", managerFullName);\r",
@@ -4360,7 +4360,7 @@
 								{
 									"key": "documentImage",
 									"type": "file",
-									"src": "/C:/Users/pc/Downloads/IMG-20241225-WA0013.jpg"
+									"src": "postman-cloud:///1f00bb20-a0aa-4780-95e0-d485a8c42125"
 								}
 							]
 						},
