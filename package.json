@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "test": "node app.js"
-},
+    "test": "node app.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "exceljs": "^4.4.0",
+    "json2csv": "^6.0.0-alpha.2",
     "newman": "^6.2.1",
     "newman-reporter-htmlextra": "^1.23.1"
   }
